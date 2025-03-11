@@ -6,9 +6,9 @@ const page = () => {
 
   const [count, setCount] = useState(0);
 
-    let counter = () =>{
-        setCount(count+1)
-    };
+  let counter = () =>{
+    setCount(count+1)
+  };
 
   return (
     <div className='w-screen h-screen flex justify-center items-center flex-col'>
