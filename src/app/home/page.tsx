@@ -1,8 +1,9 @@
 "use client";
+import withAuth from '@/hoc/withAuth';
 import React from 'react'
 import { useState } from 'react';
 
-const page = () => {
+const Home = () => {
 
   const [count, setCount] = useState(0);
 
@@ -22,4 +23,4 @@ const page = () => {
   )
 }
 
-export default page
+export default withAuth(Home)
