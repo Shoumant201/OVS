@@ -3,7 +3,7 @@ import withAuth from '@/hoc/withAuth';
 import React from 'react'
 import { useState } from 'react';
 
-const Home = () => {
+const HomePage = () => {
 
   const [count, setCount] = useState(0);
 
@@ -23,4 +23,4 @@ const Home = () => {
   )
 }
 
-export default withAuth(Home)
+export default withAuth(HomePage)
