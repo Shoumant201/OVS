@@ -8,14 +8,15 @@ const DashboardPage = () => {
   const router = useRouter();
 
   const handleLogout = () => {
-    Cookies.remove("token");
+    Cookies.remove("adminToken");
+    localStorage.removeItem("adminToken");
     router.replace("/pages/login");
   };
 
   return (
     <div>
       <p>Dashboard</p>
-      <button onClick={handleLogout} className="w-full bg-blue-500 text-white p-2 rounded">Login</button>
+      <button onClick={handleLogout} className="w-full bg-blue-500 text-white p-2 rounded">Logout</button>
     </div>
   )
 }

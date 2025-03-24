@@ -10,7 +10,7 @@ const withAuth = (WrappedComponent: React.ComponentType) => {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
     useEffect(() => {
-      const token = Cookies.get("token");
+      const token = Cookies.get("adminToken");
     
       if (!token) {
         router.replace("/pages/login"); // Redirect if not authenticated

@@ -1,5 +1,7 @@
 export const Endpoints = {
-    adminLogin: "/auth/login",
+  ADMIN: {
+    adminRegister: "/admin/adminRegister",
+    adminLogin: "/admin/adminLogin", // Changed from "/admin/login" to match backend route
+  },
+}
 
-    register: "/auth/register"
-  };
