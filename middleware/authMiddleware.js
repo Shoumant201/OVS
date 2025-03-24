@@ -17,7 +17,7 @@ export const authenticate = (req, res, next) => {
 };
 
 export const isAdminOrSuperAdmin = (req, res, next) => {
-  if (req.user.role === 'admin' || req.user.role === 'super_admin') {
+  if (req.admin.role === 'admin' || req.admin.role === 'super_admin') {
     next();
   } else {
     res.status(403).json({ message: 'Access Denied' });

@@ -8,8 +8,6 @@ import session from 'express-session';
 import passport from 'passport';
 import './config/passport.js';
 
-import db from './config/db.js';
-
 dotenv.config();
 
 const app = express();
