@@ -35,3 +35,8 @@ export const updateAdminPassword = async (userId, newPassword) => {
   return result.rows[0];
 };
 
+// Find admin by user ID
+export const findAdminByUserId = async (id) => {
+  const result = await pool.query('SELECT * FROM admins WHERE id = $1', [id]);
+  return result.rows[0];
+};

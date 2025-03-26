@@ -6,8 +6,8 @@ export const createUser = async (name, email, hashedPassword) => {
       [name, email, hashedPassword]
     );
     return result.rows[0];
-  };
-  
+};
+
 export const updateUserById = async (id, updateData) => {
     const result = await pool.query(
       'UPDATE users SET is_verified = $1 WHERE id = $2 RETURNING *',
@@ -15,10 +15,15 @@ export const updateUserById = async (id, updateData) => {
     );
     return result.rows[0];
 };
-  
 
 export const findUserByEmail = async (email) => {
   const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+  return result.rows[0];
+};
+
+// Find user by ID
+export const findUserById = async (id) => {
+  const result = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
   return result.rows[0];
 };
 
@@ -29,4 +34,4 @@ export const updateUserPassword = async (userId, newPassword) => {
       [newPassword, userId]
     );
     return result.rows[0];
-  };
+};
