@@ -11,3 +11,8 @@ export const createAdmin = async (email, password, role, addedBy) => {
 export const deleteCommissioner = async (id) => {
   await pool.query('DELETE FROM admins WHERE id = $1 AND role = $2', [id, 'commissioner']);
 };
+// Find admin by user ID
+export const findAdminByUserId = async (id) => {
+  const result = await pool.query('SELECT * FROM admins WHERE id = $1', [id]);
+  return result.rows[0];
+};
