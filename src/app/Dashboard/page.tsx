@@ -40,10 +40,23 @@ const DashboardPage = () => {
         {/* Header */}
         <div className="border-b">
           <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row gap-3 sm:justify-between sm:items-center">
-            <h1 className="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
+                      
+            <h1 className="text-2xl font-bold text-gray-800 flex flex-col sm:flex-row">
+            <div className="flex justify-center mb-6">
+          <div className="relative">
+            <div className="text-white text-4xl font-bold">OVS</div>
+            <div className="absolute -top-1 -right-3 flex">
+              <div className="w-2 h-2 bg-red-500"></div>
+              <div className="w-2 h-2 bg-blue-500"></div>
+              <div className="w-2 h-2 bg-yellow-500"></div>
+            </div>
+          </div>
+        </div>
+              Admin Dashboard
+            </h1>
             <div className="flex flex-wrap gap-2">
               <Button variant="outline" className="text-sm">Manage Users</Button>
-              <Button variant="outline" className="text-sm">Manage Commissioners</Button>
+              <Button onClick={() => router.push('/ManageCommissioner')} variant="outline" className="text-sm">Manage Commissioners</Button>
               <Button className="bg-green-500 hover:bg-green-600 text-sm">
                 <Plus className="h-4 w-4 mr-2" />
                 New Election

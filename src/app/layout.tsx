@@ -1,23 +1,27 @@
-import type { Metadata } from "next";
-import "./globals.css";
+import type React from "react"
+import "@/app/globals.css"
+import { Inter } from "next/font/google"
+import { SonnerProvider } from "@/components/sonner-provider"
 
-export const metadata: Metadata = {
-  title: "Voting Backend",
-  description: "Created by online voting Team",
-};
+const inter = Inter({ subsets: ["latin"] })
+
+export const metadata = {
+  title: "Election Management System",
+  description: "Manage your elections with ease",
+}
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="en">
-      <body
-        className={`antialiased`}
-      >
-        {children}
+      <body className={inter.className}>
+          <SonnerProvider />
+          {children}
       </body>
     </html>
-  );
+  )
 }
+
