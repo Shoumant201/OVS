@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import type { UserRole } from "@/hoc/withAuth"
+import CreateElectionForm from "@/components/CreateElection/CreateElectionForm"
 
 interface DashboardPageProps {
   userRole: UserRole
@@ -20,12 +21,6 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ userRole, userId }) => {
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
-
-  const handleLogout = () => {
-    Cookies.remove("adminToken")
-    localStorage.removeItem("adminToken")
-    router.replace("/pages/login")
-  }
 
   // Sample election data
   const elections: Election[] = [
@@ -95,17 +90,9 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ userRole, userId }) => {
                 </Button>
               )}
 
-              <Button className="bg-green-500 hover:bg-green-600 text-sm">
+              <Button onClick={() => router.replace("/CreateElection")} className="bg-green-500 hover:bg-green-600 text-sm">
                 <Plus className="h-4 w-4 mr-2" />
                 New Election
-              </Button>
-
-              <Button
-                onClick={handleLogout}
-                variant="outline"
-                className="text-sm text-red-500 hover:text-red-600 hover:bg-red-50"
-              >
-                Logout
               </Button>
             </div>
           </div>

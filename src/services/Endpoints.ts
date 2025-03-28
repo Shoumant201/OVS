@@ -9,5 +9,10 @@ export const Endpoints = {
     addCommissioner: '/admin/commissioner', // POST endpoint to add a commissioner
     deleteCommissioner: '/admin/commissioner/:id', // DELETE endpoint with :id placeholder
   },
+  PROFILE: {
+    USER_PROFILE: "/admin/profile",
+    UPDATE_PROFILE: "/admin/profile",
+    UPDATE_PASSWORD: "/admin/password",
+  }
 }
 
