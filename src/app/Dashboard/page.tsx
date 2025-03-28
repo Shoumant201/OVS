@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import type { UserRole } from "@/hoc/withAuth"
-import CreateElectionForm from "@/components/CreateElection/CreateElectionForm"
 
 interface DashboardPageProps {
   userRole: UserRole
