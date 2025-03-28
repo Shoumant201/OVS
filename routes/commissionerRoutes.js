@@ -1,6 +1,6 @@
 import express from 'express';
 import { authenticate } from '../middleware/authMiddleware.js';
-import { getCommissioners } from '../controllers/commissionerController.js';
+import { getCommissioners } from '../controllers/commissionerCOntroller.js';
 
 const router = express.Router();
 
