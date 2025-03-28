@@ -1,38 +1,66 @@
-'use client';
-import withAuth from '../../hoc/withAuth';
-import React, { useState } from 'react';
-import Cookies from 'js-cookie';
-import { useRouter } from 'next/navigation';
-import { ElectionCard, type Election } from '@/components/dashboard/ElectionCard';
-import { Search, Plus, HelpCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+"use client"
+import withAuth from "@/hoc/withAuth"
+import type React from "react"
+import { useState } from "react"
+import Cookies from "js-cookie"
+import { useRouter } from "next/navigation"
+import { ElectionCard, type Election } from "@/components/dashboard/ElectionCard"
+import { Search, Plus, HelpCircle } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import type { UserRole } from "@/hoc/withAuth"
 
-const DashboardPage = () => {
-  const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+interface DashboardPageProps {
+  userRole: UserRole
+  userId: string
+}
+
+const DashboardPage: React.FC<DashboardPageProps> = ({ userRole, userId }) => {
+  const router = useRouter()
+  const [searchQuery, setSearchQuery] = useState("")
+  const [statusFilter, setStatusFilter] = useState("all")
 
   const handleLogout = () => {
-    Cookies.remove('adminToken');
-    localStorage.removeItem('adminToken');
-    router.replace('/pages/login');
-  };
+    Cookies.remove("adminToken")
+    localStorage.removeItem("adminToken")
+    router.replace("/pages/login")
+  }
 
   // Sample election data
   const elections: Election[] = [
-    { id: 1, title: 'Test Election', status: 'Scheduled', startDate: '03/26/25, 8:00 PM', endDate: '04/03/25, 7:00 PM' },
-    { id: 2, title: 'Board Election 2025', status: 'Ongoing', startDate: '03/20/25, 9:00 AM', endDate: '03/30/25, 5:00 PM' },
-    { id: 3, title: 'Student Council 2024', status: 'Finished', startDate: '02/15/25, 8:00 AM', endDate: '02/20/25, 4:00 PM' }
-  ];
+    {
+      id: 1,
+      title: "Test Election",
+      status: "Scheduled",
+      startDate: "03/26/25, 8:00 PM",
+      endDate: "04/03/25, 7:00 PM",
+    },
+    {
+      id: 2,
+      title: "Board Election 2025",
+      status: "Ongoing",
+      startDate: "03/20/25, 9:00 AM",
+      endDate: "03/30/25, 5:00 PM",
+    },
+    {
+      id: 3,
+      title: "Student Council 2024",
+      status: "Finished",
+      startDate: "02/15/25, 8:00 AM",
+      endDate: "02/20/25, 4:00 PM",
+    },
+  ]
 
   // Filter elections based on search query and status
   const filteredElections = elections.filter((election) => {
-    const matchesSearch = election.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || election.status.toLowerCase() === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+    const matchesSearch = election.title.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesStatus = statusFilter === "all" || election.status.toLowerCase() === statusFilter
+    return matchesSearch && matchesStatus
+  })
+
+  // Check if user is admin or superadmin (has commissioner management permission)
+  const canManageCommissioners = userRole === "admin" || userRole === "super_admin"
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -40,26 +68,44 @@ const DashboardPage = () => {
         {/* Header */}
         <div className="border-b">
           <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row gap-3 sm:justify-between sm:items-center">
-                      
-            <h1 className="text-2xl font-bold text-gray-800 flex flex-col sm:flex-row">
-            <div className="flex justify-center mb-6">
-          <div className="relative">
-            <div className="text-white text-4xl font-bold">OVS</div>
-            <div className="absolute -top-1 -right-3 flex">
-              <div className="w-2 h-2 bg-red-500"></div>
-              <div className="w-2 h-2 bg-blue-500"></div>
-              <div className="w-2 h-2 bg-yellow-500"></div>
-            </div>
-          </div>
-        </div>
-              Admin Dashboard
+            <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+              <div className="relative">
+                <div className="text-black text-2xl font-bold">OVS</div>
+                <div className="absolute -top-1 -right-3 flex">
+                  <div className="w-1.5 h-1.5 bg-red-500"></div>
+                  <div className="w-1.5 h-1.5 bg-blue-500"></div>
+                  <div className="w-1.5 h-1.5 bg-yellow-500"></div>
+                </div>
+              </div>
+              {userRole === "commissioner" ? "Commissioner Dashboard" : "Admin Dashboard"}
             </h1>
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" className="text-sm">Manage Users</Button>
-              <Button onClick={() => router.push('/ManageCommissioner')} variant="outline" className="text-sm">Manage Commissioners</Button>
+              <Button variant="outline" className="text-sm">
+                Manage Users
+              </Button>
+
+              {/* Only show Manage Commissioners button for admin/superadmin users */}
+              {canManageCommissioners && (
+                <Button
+                  onClick={() => router.push("/ManageCommissioner")}
+                  variant="outline"
+                  className="text-sm"
+                >
+                  Manage Commissioners
+                </Button>
+              )}
+
               <Button className="bg-green-500 hover:bg-green-600 text-sm">
                 <Plus className="h-4 w-4 mr-2" />
                 New Election
+              </Button>
+
+              <Button
+                onClick={handleLogout}
+                variant="outline"
+                className="text-sm text-red-500 hover:text-red-600 hover:bg-red-50"
+              >
+                Logout
               </Button>
             </div>
           </div>
@@ -120,10 +166,14 @@ const DashboardPage = () => {
       <footer className="border-t py-4 mt-auto">
         <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-2">
           <div className="text-sm text-gray-500">
-            Copyright © 2025 Election Runner |{' '}
-            <a href="#" className="hover:underline">Terms of Service</a>{' '}
-            |{' '}
-            <a href="#" className="hover:underline">Privacy Policy</a>
+            Copyright © 2025 Election Runner |{" "}
+            <a href="#" className="hover:underline">
+              Terms of Service
+            </a>{" "}
+            |{" "}
+            <a href="#" className="hover:underline">
+              Privacy Policy
+            </a>
           </div>
           <Button
             variant="outline"
@@ -136,7 +186,8 @@ const DashboardPage = () => {
         </div>
       </footer>
     </div>
-  );
-};
+  )
+}
 
-export default withAuth(DashboardPage);
+export default withAuth(DashboardPage)
+

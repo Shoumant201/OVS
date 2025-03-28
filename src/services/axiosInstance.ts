@@ -1,28 +1,29 @@
 import axios from "axios"
 import Cookies from "js-cookie"
 
-// Create a custom axios instance with default configuration
-const axiosInstance = axios.create({
+// Create axios instance with base URL
+const AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api",
+  timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },
-  withCredentials: true, // Important for cookies/authentication
 })
 
-// Add a request interceptor to include the auth token in all requests
-axiosInstance.interceptors.request.use(
+// Add request interceptor to add auth token to requests
+AxiosInstance.interceptors.request.use(
   (config) => {
-    // Try to get token from cookies first (for consistency with login page)
-    let token: string | null | undefined = Cookies.get("adminToken")
+    // Get token from cookies or localStorage
+    const token = Cookies.get("adminToken") || localStorage.getItem("adminToken")
 
-    // Fallback to localStorage if not in cookies
-    if (!token && typeof window !== "undefined") {
-      token = localStorage.getItem("adminToken")
-    }
-
+    // If token exists, add to headers
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
+
+      // Log for debugging (remove in production)
+      console.log("Adding token to request:", token.substring(0, 20) + "...")
+    } else {
+      console.log("No token found for request")
     }
 
     return config
@@ -32,34 +33,29 @@ axiosInstance.interceptors.request.use(
   },
 )
 
-// Add a response interceptor to handle common response scenarios
-axiosInstance.interceptors.response.use(
+// Add response interceptor to handle auth errors
+AxiosInstance.interceptors.response.use(
   (response) => {
     return response
   },
   (error) => {
-    // Handle 401 Unauthorized errors (token expired, etc.)
-    if (error.response?.status === 401) {
-      // Clear token from both storage mechanisms
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("adminToken")
-        Cookies.remove("adminToken")
+    // Handle 401 Unauthorized errors
+    if (error.response && error.response.status === 401) {
+      console.log("Unauthorized request - clearing auth data")
 
-        // Check if we're not already on the login page to prevent redirect loops
-        if (!window.location.pathname.includes("/adminLogin")) {
-          window.location.href = "/Admin/adminLogin"
-        }
+      // Clear auth data
+      Cookies.remove("adminToken")
+      localStorage.removeItem("adminToken")
+
+      // Redirect to login page if not already there
+      if (typeof window !== "undefined" && !window.location.pathname.includes("/login")) {
+        window.location.href = "/pages/login"
       }
-    }
-
-    // Handle 403 Forbidden errors
-    if (error.response?.status === 403) {
-      console.error("Permission denied:", error.response.data)
     }
 
     return Promise.reject(error)
   },
 )
 
-export default axiosInstance
+export default AxiosInstance
 
