@@ -53,3 +53,8 @@ export const unbanUser = async (userId) => {
   );
   return result.rows[0];
 };
+
+export const getAllUsers = async () => {
+  const result = await pool.query('SELECT * FROM users');
+  return result.rows;
+};

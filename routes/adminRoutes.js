@@ -1,12 +1,10 @@
 import express from 'express';
 import { authenticate, isAdminOrSuperAdmin } from '../middleware/authMiddleware.js';
 import { 
-  addCommissioner, adminForgotPassword, adminLogin, adminRegister, adminResetPassword, 
-  adminForgotPassword, 
-  adminLogin, 
-  adminRegister, 
-  adminResetPassword, 
-  removeCommissioner, getUserProfileController, updateUserProfileController, updateUserPasswordController 
+  addCommissioner, adminForgotPassword, adminLogin, adminRegister, adminResetPassword,
+  removeCommissioner, getUserProfileController, updateUserProfileController, updateUserPasswordController, 
+  getUsers,
+  removeUser
 } from '../controllers/adminController.js';
 import { getCommissioners, getCommissionerById } from '../controllers/commissionerCOntroller.js';
 import { banUserController, unbanUserController } from '../controllers/userController.js';
@@ -37,7 +35,9 @@ router.post('/adminForgot-password', adminForgotPassword);
 router.post('/adminReset-password', adminResetPassword);
 
 // Ban/Unban User Routes (Admin only)
-router.put('/users/:id/ban', authenticate, isAdminOrSuperAdmin, banUserController);
-router.put('/users/:id/unban', authenticate, isAdminOrSuperAdmin, unbanUserController);
+router.get("/getUsers", authenticate, getUsers)
+router.put('/users/:id/ban', authenticate, banUserController);
+router.put('/users/:id/unban', authenticate, unbanUserController);
+router.delete('/delUser/:id', authenticate, removeUser)
 
 export default router;

@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { createCommissioner, findAdminByEmail, updateAdminById, deleteCommissioner, findCommissionerByEmail, getUserProfile, isEmailInUse, updateUserProfile, getUserPassword, updateUserPassword, hashPassword, comparePassword } from '../models/adminModel.js';
+import { createCommissioner, findAdminByEmail, updateAdminById, deleteCommissioner, findCommissionerByEmail, getUserProfile, isEmailInUse, updateUserProfile, getUserPassword, updateUserPassword, hashPassword, comparePassword, deleteUser } from '../models/adminModel.js';
+import { getAllUsers } from '../models/userModel.js';
 
 export const addCommissioner = async (req, res) => {
   const { email, password, role, name, addedBy } = req.body;
@@ -347,6 +348,24 @@ export const updateUserPasswordController = async (req, res) => {
     res.status(500).json({ message: "Server error" })
   }
 }
+export const getUsers = async (req, res) => {
+  try {
+    const Users = await getAllUsers();
+    res.json(Users);
+  } catch (err) {
+    console.error("Error fetching users:", err)
+    res.status(500).json({ message: "Server error", error: err.message })
+  }
+};
 
 
+export const removeUser = async (req, res) => {
+  try {
+    await deleteUser(req.params.id);
+    res.json({ message: 'User removed' });
+  } catch (err) {
+    console.error('Registration Error:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
 
+  }
+};

@@ -187,4 +187,6 @@ export const comparePassword = async (password, hash) => {
   return bcrypt.compare(password, hash)
 }
 
-
+export const deleteUser = async (id) => {
+  await pool.query('DELETE FROM users WHERE id = $1', [id]);
+};
