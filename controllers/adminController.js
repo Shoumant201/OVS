@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { createCommissioner, findAdminByEmail, updateAdminById, deleteCommissioner, findCommissionerByEmail } from '../models/adminModel.js';
+import { createCommissioner, findAdminByEmail, updateAdminById, deleteCommissioner, findCommissionerByEmail, getUserProfile, isEmailInUse, updateUserProfile, getUserPassword, updateUserPassword, hashPassword, comparePassword } from '../models/adminModel.js';
 
 export const addCommissioner = async (req, res) => {
   const { email, password, role, name, addedBy } = req.body;
@@ -91,6 +91,7 @@ export const adminLogin = async (req, res) => {
         const adminToken = jwt.sign(
           {
             id: admin.id,
+            name: admin.name,
             email: admin.email,
             role: admin.role || "admin", // Ensure role is always set
           },
@@ -111,6 +112,7 @@ export const adminLogin = async (req, res) => {
         const adminToken = jwt.sign(
           {
             id: commissioner.id,
+            name: admin.name,
             email: commissioner.email,
             role: "commissioner", // Explicitly set role
           },
@@ -206,3 +208,145 @@ export const adminResetPassword = async (req, res) => {
     res.status(400).json({ message: 'Invalid or expired token' });
   }
 };
+
+/**
+ * Validate user role
+ * @param {string} role - User role
+ * @returns {boolean} True if role is valid
+ */
+const validateRole = (role) => {
+  return role === "admin" || role === "commissioner"
+}
+
+/**
+ * Validate email format
+ * @param {string} email - Email to validate
+ * @returns {boolean} True if email is valid
+ */
+const validateEmail = (email) => {
+  return email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)
+}
+
+/**
+ * Get user profile
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
+export const getUserProfileController = async (req, res) => {
+  try {
+    const userId = req.user.id
+    const userRole = req.user.role || req.headers["x-user-role"]
+
+    if (!validateRole(userRole)) {
+      return res.status(400).json({ message: "Invalid user role" })
+    }
+
+    const user = await getUserProfile(userId, userRole)
+
+    res.status(200).json(user)
+  } catch (error) {
+    console.error("Error fetching user profile:", error)
+
+    if (error.message === "User not found") {
+      return res.status(404).json({ message: "User not found" })
+    }
+
+    res.status(500).json({ message: "Server error" })
+  }
+}
+
+/**
+ * Update user profile
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
+export const updateUserProfileController = async (req, res) => {
+  try {
+    const { name, email } = req.body
+    const userId = req.user.id
+    const userRole = req.user.role || req.headers["x-user-role"]
+
+    if (!validateRole(userRole)) {
+      return res.status(400).json({ message: "Invalid user role" })
+    }
+
+    // Input validation
+    if (!name || !email) {
+      return res.status(400).json({ message: "Name and email are required" })
+    }
+
+    if (!validateEmail(email)) {
+      return res.status(400).json({ message: "Invalid email format" })
+    }
+
+    // Check if email is already in use
+    const emailInUse = await isEmailInUse(email, userId, userRole)
+
+    if (emailInUse) {
+      return res.status(400).json({ message: "Email is already in use" })
+    }
+
+    // Update user profile
+    await updateUserProfile(userId, name, email, userRole)
+
+    res.status(200).json({ message: "Profile updated successfully" })
+  } catch (error) {
+    console.error("Error updating profile:", error)
+    res.status(500).json({ message: "Server error" })
+  }
+}
+
+/**
+ * Update user password
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
+export const updateUserPasswordController = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body
+    const userId = req.user.id
+    const userRole = req.user.role || req.headers["x-user-role"]
+
+    if (!validateRole(userRole)) {
+      return res.status(400).json({ message: "Invalid user role" })
+    }
+
+    // Input validation
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: "Current and new passwords are required" })
+    }
+
+    if (newPassword.length < 8) {
+      return res.status(400).json({ message: "Password must be at least 8 characters long" })
+    }
+
+    // Get current password hash
+    const passwordHash = await getUserPassword(userId, userRole)
+
+    // Verify current password
+    const isPasswordValid = await comparePassword(currentPassword, passwordHash)
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Current password is incorrect" })
+    }
+
+    // Hash new password
+    const hashedPassword = await hashPassword(newPassword)
+
+    // Update password
+    await updateUserPassword(userId, hashedPassword, userRole)
+
+    res.status(200).json({ message: "Password updated successfully" })
+  } catch (error) {
+    console.error("Error updating password:", error)
+
+    if (error.message === "User not found") {
+      return res.status(404).json({ message: "User not found" })
+    }
+
+    res.status(500).json({ message: "Server error" })
+  }
+}
+
+
+
