@@ -35,3 +35,21 @@ export const updateUserPassword = async (userId, newPassword) => {
     );
     return result.rows[0];
 };
+
+// Ban User
+export const banUser = async (userId) => {
+  const result = await pool.query(
+    'UPDATE users SET is_banned = TRUE WHERE id = $1 RETURNING *',
+    [userId]
+  );
+  return result.rows[0];
+};
+
+// Unban User
+export const unbanUser = async (userId) => {
+  const result = await pool.query(
+    'UPDATE users SET is_banned = FALSE WHERE id = $1 RETURNING *',
+    [userId]
+  );
+  return result.rows[0];
+};

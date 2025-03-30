@@ -15,6 +15,17 @@ const pool = new Pool({
 
 const createTables = async () => {
   const queryText = `
+    CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255),
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password VARCHAR(255),
+        is_verified BOOLEAN DEFAULT FALSE,
+        is_banned BOOLEAN DEFAULT FALSE,  -- Added is_banned column
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
     CREATE TABLE IF NOT EXISTS elections (
         id SERIAL PRIMARY KEY,
         title VARCHAR(255) NOT NULL,
