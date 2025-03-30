@@ -74,7 +74,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ userRole, userId }) => {
               {userRole === "commissioner" ? "Commissioner Dashboard" : "Admin Dashboard"}
             </h1>
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" className="text-sm">
+              <Button onClick={() => router.push("ManageUser")} variant="outline" className="text-sm">
                 Manage Users
               </Button>
 
