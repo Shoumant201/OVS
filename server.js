@@ -1,8 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import session from 'express-session';
-import passport from 'passport';
 
 import authRoutes from './routes/authRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
@@ -10,6 +8,8 @@ import commissionerRoutes from './routes/commissionerRoutes.js';
 import electionRoutes from "./routes/election.routes.js"; 
 
 import { preventBannedUser } from './middleware/authMiddleware.js'; // Import preventBannedUser
+import session from 'express-session';
+import passport from 'passport';
 import './config/passport.js';
 
 dotenv.config();
