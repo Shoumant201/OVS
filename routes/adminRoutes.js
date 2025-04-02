@@ -3,10 +3,6 @@ import { authenticate, isAdminOrSuperAdmin } from '../middleware/authMiddleware.
 import { 
   addCommissioner, 
   removeCommissioner, 
-  adminForgotPassword, 
-  adminLogin, 
-  adminRegister, 
-  adminResetPassword,
   getUserProfileController, 
   updateUserProfileController, 
   updateUserPasswordController, 
