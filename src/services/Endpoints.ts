@@ -20,6 +20,11 @@ export const Endpoints = {
     banUser: "/admin/users/:id/ban", // PUT endpoint to ban a user
     unbanUser: "/admin/users/:id/unban", // PUT endpoint to unban a user
     deleteUser: "/admin/delUser/:id", // DELETE endpoint to delete a user
-  },  
+  },
+  
+  ELECTION: {
+    createElection: "/elections/createElection",
+    getAllElection: "/elections/"
+  }
 }
 

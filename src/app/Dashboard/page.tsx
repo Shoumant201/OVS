@@ -1,7 +1,7 @@
 "use client"
 import withAuth from "@/hoc/withAuth"
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Cookies from "js-cookie"
 import { useRouter } from "next/navigation"
 import { ElectionCard, type Election } from "@/components/dashboard/ElectionCard"
@@ -10,48 +10,67 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import type { UserRole } from "@/hoc/withAuth"
+import { DateTime } from "luxon"
+import { getAllElections } from "@/services/api/Authentication"
 
 interface DashboardPageProps {
   userRole: UserRole
   userId: string
 }
 
+export function getElectionStatus(start_date: string, end_date: string): string {
+  const now = DateTime.now();
+  
+  // Use yyyy instead of yy for proper parsing
+  const start = DateTime.fromISO(start_date);
+  const end = DateTime.fromISO(end_date);
+
+  if (!start.isValid || !end.isValid) {
+    console.error("Invalid date format:", { start_date, end_date });
+    return "Unknown";
+  }
+
+  if (now < start) return "Scheduled";
+  if (now >= start && now <= end) return "Ongoing";
+  return "Finished";
+}
+
+
+
 const DashboardPage: React.FC<DashboardPageProps> = ({ userRole, userId }) => {
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
+  
+  const [elections, setElections] = useState<Election[]>([])
 
-  // Sample election data
-  const elections: Election[] = [
-    {
-      id: 1,
-      title: "Test Election",
-      status: "Scheduled",
-      startDate: "03/26/25, 8:00 PM",
-      endDate: "04/03/25, 7:00 PM",
-    },
-    {
-      id: 2,
-      title: "Board Election 2025",
-      status: "Ongoing",
-      startDate: "03/20/25, 9:00 AM",
-      endDate: "03/30/25, 5:00 PM",
-    },
-    {
-      id: 3,
-      title: "Student Council 2024",
-      status: "Finished",
-      startDate: "02/15/25, 8:00 AM",
-      endDate: "02/20/25, 4:00 PM",
-    },
-  ]
+  
+
+  useEffect(() => {
+    // Fetch elections from the API
+    const fetchElections = async () => {
+      try {
+        const fetchedElections = await getAllElections()
+        console.log(fetchElections);
+        setElections(fetchedElections)  // Set fetched elections in state
+      } catch (error) {
+        console.error("Error fetching elections:", error)
+      }
+    }
+    
+    fetchElections()  // Call the fetch function
+  }, [])
+  
+
+  
 
   // Filter elections based on search query and status
   const filteredElections = elections.filter((election) => {
-    const matchesSearch = election.title.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesStatus = statusFilter === "all" || election.status.toLowerCase() === statusFilter
-    return matchesSearch && matchesStatus
-  })
+    const status = getElectionStatus(election.start_date, election.end_date);
+    const matchesSearch = election.title.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = statusFilter === "all" || status.toLowerCase() === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   // Check if user is admin or superadmin (has commissioner management permission)
   const canManageCommissioners = userRole === "admin" || userRole === "super_admin"

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import Link from 'next/link';
+import { createElection } from '@/services/api/Authentication';
 
 const CreateElectionPage: React.FC = () => {
   const router = useRouter();
@@ -10,34 +11,25 @@ const CreateElectionPage: React.FC = () => {
   const [startDate, setStartDate] = useState(format(new Date(), 'yyyy-MM-dd\'T\'HH:mm'));
   const [endDate, setEndDate] = useState(format(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd\'T\'HH:mm'));
   const [timezone, setTimezone] = useState('GMT+05:45');
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e:any) => {
     e.preventDefault();
-    
-    try {
-      // TODO: Replace with your actual API call
-      const response = await fetch('/api/elections', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title,
-          startDate,
-          endDate,
-          timezone
-        })
-      });
+    setLoading(true);
+    setError(null);
 
-      if (response.ok) {
-        // Redirect to elections list or dashboard
-        router.push('/elections');
-      } else {
-        // Handle error
-        console.error('Failed to create election');
-      }
+    try {
+      const electionData = await createElection(title, startDate, endDate);
+      console.log("Election created successfully:", electionData);
+      router.replace("/Dashboard")
+      // Optionally, redirect or show success message
+      // window.location.href = "/path-to-redirect"; // Redirect to a different page if needed
     } catch (error) {
-      console.error('Error creating election:', error);
+      setError("Failed to create election. Please try again.");
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
