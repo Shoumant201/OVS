@@ -32,7 +32,8 @@ const createTables = async () => {
         description TEXT,
         start_date TIMESTAMP NOT NULL,
         end_date TIMESTAMP NOT NULL,
-        created_by INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        created_by_admin INTEGER REFERENCES admins(id) ON DELETE CASCADE,
+        created_by_commissioner INTEGER REFERENCES commissioners(id) ON DELETE CASCADE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );

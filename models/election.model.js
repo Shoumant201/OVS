@@ -1,9 +1,9 @@
 import pool from "../config/db.js";
 
-export const createElection = async (title, description, start_date, end_date, created_by) => {
+export const createElection = async (title, start_date, end_date,created_by, created_by_column) => {
     const result = await pool.query(
-        `INSERT INTO elections (title, description, start_date, end_date, created_by) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-        [title, description, start_date, end_date, created_by]
+        `INSERT INTO elections (title, start_date, end_date, ${created_by_column}) VALUES ($1, $2, $3, $4) RETURNING *`,
+        [title, start_date, end_date, created_by]
     );
     return result.rows[0];
 };

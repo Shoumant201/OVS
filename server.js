@@ -12,6 +12,8 @@ import session from 'express-session';
 import passport from 'passport';
 import './config/passport.js';
 
+import cookieParser from 'cookie-parser';
+
 dotenv.config();
 
 const app = express();
@@ -28,6 +30,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(preventBannedUser); // Apply middleware globally
+
+app.use(cookieParser());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);

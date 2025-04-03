@@ -16,10 +16,9 @@ const router = express.Router();
 
 // CRUD Operations - Only Admins/Commissioners should have access
 router.post(
-    "/",
-    authenticate, // Changed from protect to authenticate
-    isAdmin,
-    hasRole(["super_admin", "commissioner"]), // Adjust Permissions Here
+    "/createElection",
+    authenticate,
+    //hasRole(["super_admin", "commissioner", "admin"]), // Adjust Permissions Here
     createElectionController
 );
 

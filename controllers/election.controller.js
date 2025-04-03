@@ -13,10 +13,42 @@ import { findUserById } from "../models/userModel.js";
 // Create election
 export const createElectionController = async (req, res) => {
     try {
-        const { title, description, start_date, end_date } = req.body;
+        const { title, start_date, end_date } = req.body;
         const created_by = req.user.id; // Assuming `req.user` is populated by `protect` middleware
+        const role = req.user.role; // Get the role from cookies
 
-        const election = await createElection(title, description, start_date, end_date, created_by);
+        console.log(role);
+        
+        // Check if the role exists in the cookies
+        if (!role) {
+            return res.status(400).json({
+                success: false,
+                message: 'User role not found in cookies',
+            });
+        }
+
+        // Decide the column based on the user role
+        let created_by_column;
+
+        if (role === 'admin') {
+            created_by_column = 'created_by_admin';
+        } else if (role === 'commissioner') {
+            created_by_column = 'created_by_commissioner';
+        } else {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid user role in cookies',
+            });
+        }
+
+        // Create the election with the appropriate created_by column
+        const election = await createElection(
+            title,
+            start_date,
+            end_date,
+            created_by,
+            created_by_column // Pass the column name dynamically
+        );
 
         res.status(201).json({
             success: true,
@@ -31,6 +63,8 @@ export const createElectionController = async (req, res) => {
         });
     }
 };
+
+
 
 // Get election by ID
 export const getElectionByIdController = async (req, res) => {
@@ -59,22 +93,36 @@ export const getElectionByIdController = async (req, res) => {
 };
 
 // Get all elections
-export const getAllElectionsController = async (req, res) => {
-    try {
-        const elections = await getAllElections();
+// export const getAllElectionsController = async (req, res) => {
+//     try {
+//         const elections = await getAllElections();
 
-        res.status(200).json({
-            success: true,
-            count: elections.length,
-            data: elections,
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Server error",
-            error: error.message,
-        });
-    }
+//         res.status(200).json({
+//             success: true,
+//             count: elections.length,
+//             data: elections,
+//         });
+//     } catch (error) {
+        
+//         res.status(500).json({ message: "Server error", error: err.message })
+//         res.status(500).json({
+//             success: false,
+//             message: "Server error",
+//             error: error.message,
+//         });
+//     }
+// };
+
+export const getAllElectionsController = async (req, res) => {
+  try {
+    const elections = await getAllElections();
+    res.json(elections);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message })
+    console.error("Detailed error:", err); // Log the full error details
+    res.status(500).json({ message: "Server error", error: err.message });
+    
+  }
 };
 
 // Update election
