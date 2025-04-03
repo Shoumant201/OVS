@@ -1,43 +1,37 @@
 import express from 'express';
 import { authenticate, isAdminOrSuperAdmin } from '../middleware/authMiddleware.js';
 import { 
-  addCommissioner, adminForgotPassword, adminLogin, adminRegister, adminResetPassword,
-  removeCommissioner, getUserProfileController, updateUserProfileController, updateUserPasswordController, 
+  addCommissioner, 
+  removeCommissioner, 
+  getUserProfileController, 
+  updateUserProfileController, 
+  updateUserPasswordController, 
   getUsers,
   removeUser
 } from '../controllers/adminController.js';
-import { getCommissioners, getCommissionerById } from '../controllers/commissionerCOntroller.js';
+import { getCommissioners, getCommissionerById } from '../controllers/commissionerController.js';
 import { banUserController, unbanUserController } from '../controllers/userController.js';
 
 const router = express.Router();
 
-// router.post('/commissioner', addCommissioner);
-// router.delete('/commissioner/:id', removeCommissioner);
-
-router.post("/commissioner", authenticate, isAdminOrSuperAdmin, addCommissioner)
-router.delete("/commissioner/:id", authenticate, isAdminOrSuperAdmin, removeCommissioner)
-router.get("/getCommissioners", authenticate, isAdminOrSuperAdmin, getCommissioners)
-router.get("/getCommissioner/:id", authenticate, isAdminOrSuperAdmin, getCommissionerById)
-
+router.post("/commissioner", authenticate, isAdminOrSuperAdmin, addCommissioner);
+router.delete("/commissioner/:id", authenticate, isAdminOrSuperAdmin, removeCommissioner);
+router.get("/getCommissioners", authenticate, isAdminOrSuperAdmin, getCommissioners);
+router.get("/getCommissioner/:id", authenticate, isAdminOrSuperAdmin, getCommissionerById);
 
 // Get user profile
-router.get("/profile", authenticate, getUserProfileController)
+router.get("/profile", authenticate, getUserProfileController);
 
 // Update user profile
-router.put("/profile", authenticate, updateUserProfileController)
+router.put("/profile", authenticate, updateUserProfileController);
 
 // Update user password
-router.put("/password", authenticate, updateUserPasswordController)
-
-router.post('/adminRegister', adminRegister);
-router.post('/adminLogin', adminLogin);
-router.post('/adminForgot-password', adminForgotPassword);
-router.post('/adminReset-password', adminResetPassword);
+router.put("/password", authenticate, updateUserPasswordController);
 
 // Ban/Unban User Routes (Admin only)
-router.get("/getUsers", authenticate, getUsers)
+router.get("/getUsers", authenticate, getUsers);
 router.put('/users/:id/ban', authenticate, banUserController);
 router.put('/users/:id/unban', authenticate, unbanUserController);
-router.delete('/delUser/:id', authenticate, removeUser)
+router.delete('/delUser/:id', authenticate, removeUser);
 
 export default router;
