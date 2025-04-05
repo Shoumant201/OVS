@@ -5,6 +5,7 @@ import { Inter } from "next/font/google"
 import { Toaster } from "@/components/ui/sonner"
 import Navbar from "@/components/Navbar"
 import { usePathname } from "next/navigation"
+import Footer from "@/components/Footer"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -30,6 +31,7 @@ export default function RootLayout({
         {!isLoginPage && <Navbar />}
           {children}
           <Toaster />
+        {!isLoginPage && <Footer/>}
       </body>
     </html>
   )

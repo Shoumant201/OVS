@@ -81,10 +81,20 @@ export const getUsersAPI = async () => {
   export const getAllElections = async () => {
     try {
       const response = await AxiosInstance.get(Endpoints.ELECTION.getAllElection)
-      console.log(response.data)
       return response.data
     } catch (error) {
       console.error("Error fetching elections:", error)
       throw error
     }
   } 
+
+  export const getElectionById = async (id:any) => {
+    try{
+      const endpoint = Endpoints.ELECTION.getElectionByID.replace(":id", id.toString())
+      const response = await AxiosInstance.get(endpoint);
+      return response.data
+    } catch (error) {
+      console.error("Error fetching elections:", error)
+      throw error
+    }
+  }

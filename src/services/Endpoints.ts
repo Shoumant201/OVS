@@ -24,7 +24,8 @@ export const Endpoints = {
   
   ELECTION: {
     createElection: "/elections/createElection",
-    getAllElection: "/elections/"
+    getAllElection: "/elections/",
+    getElectionByID: "/elections/:id"
   }
 }
 

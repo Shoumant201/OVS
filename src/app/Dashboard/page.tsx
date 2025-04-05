@@ -18,24 +18,6 @@ interface DashboardPageProps {
   userId: string
 }
 
-export function getElectionStatus(start_date: string, end_date: string): string {
-  const now = DateTime.now();
-  
-  // Use yyyy instead of yy for proper parsing
-  const start = DateTime.fromISO(start_date);
-  const end = DateTime.fromISO(end_date);
-
-  if (!start.isValid || !end.isValid) {
-    console.error("Invalid date format:", { start_date, end_date });
-    return "Unknown";
-  }
-
-  if (now < start) return "Scheduled";
-  if (now >= start && now <= end) return "Ongoing";
-  return "Finished";
-}
-
-
 
 const DashboardPage: React.FC<DashboardPageProps> = ({ userRole, userId }) => {
   const router = useRouter()
@@ -51,7 +33,6 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ userRole, userId }) => {
     const fetchElections = async () => {
       try {
         const fetchedElections = await getAllElections()
-        console.log(fetchElections);
         setElections(fetchedElections)  // Set fetched elections in state
       } catch (error) {
         console.error("Error fetching elections:", error)
@@ -66,9 +47,9 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ userRole, userId }) => {
 
   // Filter elections based on search query and status
   const filteredElections = elections.filter((election) => {
-    const status = getElectionStatus(election.start_date, election.end_date);
+    const status = election.status?.toLowerCase() || "unknown";
     const matchesSearch = election.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === "all" || status.toLowerCase() === statusFilter;
+    const matchesStatus = statusFilter === "all" || status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -166,30 +147,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ userRole, userId }) => {
           </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="border-t py-4 mt-auto">
-        <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-2">
-          <div className="text-sm text-gray-500">
-            Copyright © 2025 Election Runner |{" "}
-            <a href="#" className="hover:underline">
-              Terms of Service
-            </a>{" "}
-            |{" "}
-            <a href="#" className="hover:underline">
-              Privacy Policy
-            </a>
-          </div>
-          <Button
-            variant="outline"
-            size="icon"
-            className="fixed bottom-6 right-6 h-12 w-12 rounded-full bg-orange-500 text-white hover:bg-orange-600 shadow-lg"
-          >
-            <HelpCircle className="h-6 w-6" />
-            <span className="sr-only">Help</span>
-          </Button>
-        </div>
-      </footer>
+      
     </div>
   )
 }
