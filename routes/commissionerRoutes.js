@@ -1,7 +1,7 @@
 import express from 'express';
 import { authenticate } from '../middleware/authMiddleware.js';
 import { isAdmin, hasRole } from '../middleware/admin.middleware.js';
-import { getCommissioners } from '../controllers/commissionerCOntroller.js';
+import { getCommissioners } from '../controllers/commissionerController.js';
 import { banUserController, unbanUserController } from '../controllers/userController.js';
 
 const router = express.Router();

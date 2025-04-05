@@ -69,27 +69,37 @@ export const createElectionController = async (req, res) => {
 // Get election by ID
 export const getElectionByIdController = async (req, res) => {
     try {
-        const { id } = req.params;
-        const election = await getElectionById(id);
+        const {id} = req.params;
+        const elections = await getElectionById(id);
+        res.json(elections);
+      } catch (err) {
+        res.status(500).json({ message: "Server error", error: err.message })
+        console.error("Detailed error:", err); // Log the full error details
+        res.status(500).json({ message: "Server error", error: err.message });
+        
+      }
+    // try {
+    //     const { id } = req.params;
+    //     const election = await getElectionById(id);
 
-        if (!election) {
-            return res.status(404).json({
-                success: false,
-                message: "Election not found",
-            });
-        }
+    //     if (!election) {
+    //         return res.status(404).json({
+    //             success: false,
+    //             message: "Election not found",
+    //         });
+    //     }
 
-        res.status(200).json({
-            success: true,
-            data: election,
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Server error",
-            error: error.message,
-        });
-    }
+    //     res.status(200).json({
+    //         success: true,
+    //         data: election,
+    //     });
+    // } catch (error) {
+    //     res.status(500).json({
+    //         success: false,
+    //         message: "Server error",
+    //         error: error.message,
+    //     });
+    // }
 };
 
 // Get all elections

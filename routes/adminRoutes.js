@@ -5,7 +5,8 @@ import {
   removeCommissioner, 
   getUserProfileController, 
   updateUserProfileController, 
-  updateUserPasswordController, 
+  updateUserPasswordController,
+  adminForgotPassword, adminLogin, adminRegister, adminResetPassword, 
   getUsers,
   removeUser
 } from '../controllers/adminController.js';
@@ -27,6 +28,11 @@ router.put("/profile", authenticate, updateUserProfileController);
 
 // Update user password
 router.put("/password", authenticate, updateUserPasswordController);
+
+router.post('/adminRegister', adminRegister);
+router.post('/adminLogin', adminLogin);
+router.post('/adminForgot-password', adminForgotPassword);
+router.post('/adminReset-password', adminResetPassword);
 
 // Ban/Unban User Routes (Admin only)
 router.get("/getUsers", authenticate, getUsers);
