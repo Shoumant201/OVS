@@ -8,6 +8,16 @@ import {
     getUsersInElectionController,
     registerUserForElectionController,
     unregisterUserForElectionController,
+    createQuestionController,
+    getAllQuestionsController,
+    getQuestionByElectionIdController,
+    getAllCandidatesController,
+    getCandidatesByQuestionIdController,
+    deleteQuestionController,
+    deleteCandidateController,
+    updateQuestionController,
+    updateCandidateController,
+    createCandidateController,
 } from "../controllers/election.controller.js";
 import { authenticate } from "../middleware/authMiddleware.js"; // Fixed import
 import { isAdmin, hasRole } from "../middleware/admin.middleware.js";
@@ -29,7 +39,7 @@ router.put(
     "/:id",
     authenticate,
     isAdmin,
-    hasRole(["super_admin", "commissioner"]), // Only commissioner and admin allow update
+    hasRole(["super_admin", "commissioner", "admin"]), // Only commissioner and admin allow update
     updateElectionController
 );
 
@@ -37,7 +47,7 @@ router.delete(
     "/:id",
     authenticate,
     isAdmin,
-    hasRole(["super_admin", "commissioner"]),  // Only Commissioner allow Delete.
+    hasRole(["super_admin", "commissioner", "admin"]),  // Only Commissioner allow Delete.
     deleteElectionController
 );
 
@@ -46,5 +56,46 @@ router.get("/:id/users", authenticate, isAdmin, hasRole(["super_admin", "commiss
 
 router.post("/:electionId/register", authenticate, registerUserForElectionController); // Register
 router.delete("/:electionId/unregister", authenticate, unregisterUserForElectionController);  // Unregister user
+
+router.post("/createQuestion", authenticate, isAdmin, hasRole(["super_admin", "commissioner", "admin"]), createQuestionController )
+router.post("/createCandidate", authenticate, isAdmin, hasRole(["super_admin", "commissioner", "admin"]), createCandidateController )
+
+router.get("/getAllQuestions", authenticate, getAllQuestionsController);
+router.get("/getAllQuestions/:id", authenticate, getQuestionByElectionIdController);
+
+router.get("/getAllCandidates", authenticate, getAllCandidatesController);
+router.get("/getAllCandidates/:id", authenticate, getCandidatesByQuestionIdController);
+
+router.delete(
+    "/deleteQuestion/:id",
+    authenticate,
+    isAdmin,
+    hasRole(["super_admin", "commissioner", "admin"]),  // Only Commissioner allow Delete.
+    deleteQuestionController
+);
+
+router.delete(
+    "/deleteCandidate/:id",
+    authenticate,
+    isAdmin,
+    hasRole(["super_admin", "commissioner", "admin"]),  // Only Commissioner allow Delete.
+    deleteCandidateController
+);
+
+router.put(
+    "/updateQuestion/:id",
+    authenticate,
+    isAdmin,
+    hasRole(["super_admin", "commissioner", "admin"]), // Only commissioner and admin allow update
+    updateQuestionController
+);
+
+router.put(
+    "/updateCandidate/:id",
+    authenticate,
+    isAdmin,
+    hasRole(["super_admin", "commissioner", "admin"]), // Only commissioner and admin allow update
+    updateCandidateController
+);
 
 export default router;
