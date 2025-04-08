@@ -5,9 +5,9 @@ export const Endpoints = {
   },
   COMMISSIONER: {
     // Add this endpoint for fetching commissioners
-    getCommissioners: '/admin/getCommissioners', // GET endpoint to fetch all commissioners
-    addCommissioner: '/admin/commissioner', // POST endpoint to add a commissioner
-    deleteCommissioner: '/admin/commissioner/:id', // DELETE endpoint with :id placeholder
+    getCommissioners: "/admin/getCommissioners", // GET endpoint to fetch all commissioners
+    addCommissioner: "/admin/commissioner", // POST endpoint to add a commissioner
+    deleteCommissioner: "/admin/commissioner/:id", // DELETE endpoint with :id placeholder
   },
   PROFILE: {
     USER_PROFILE: "/admin/profile",
@@ -21,11 +21,29 @@ export const Endpoints = {
     unbanUser: "/admin/users/:id/unban", // PUT endpoint to unban a user
     deleteUser: "/admin/delUser/:id", // DELETE endpoint to delete a user
   },
-  
+
   ELECTION: {
     createElection: "/elections/createElection",
     getAllElection: "/elections/",
-    getElectionByID: "/elections/:id"
-  }
-}
+    getElectionByID: "/elections/:id",
+    deleteElection: "/elections/:id",
+    updateElection: "/elections/:id",
+  },
 
+  BALLOT: {
+    createQuestion: "/elections/createQuestion",
+    createCandidate: "/elections/createCandidate",
+
+    getAllQuestions: "/elections/getAllQuestions",
+    getAllCandidates: "/elections/getAllCandidates",
+
+    getQuestionByElectionId: "/elections/getAllQuestions/:id",
+    getCandidateByQuestionId: "/elections/getAllCandidates/:id",
+
+    deleteQuestion: "/elections/deleteQuestion/:id",
+    deleteCandidate: "/elections/deleteCandidate/:id",
+
+    updateQuestion: "/elections/updateQuestion/:id",
+    updateCandidate: "/elections/updateCandidate/:id",
+  },
+}

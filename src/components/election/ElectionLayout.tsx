@@ -10,7 +10,7 @@ import type { Election } from "@/components/dashboard/ElectionCard"
 interface ElectionLayoutProps {
   election: Election
   children: React.ReactNode
-  activePage?: "overview" | "settings" | "ballot" | "voters" | "preview" | "addons"
+  activePage?: "overview" | "settings" | "ballot" | "voters" | "preview" | "addons" | "launch"
 }
 
 export function ElectionLayout({ election, children, activePage = "overview" }: ElectionLayoutProps) {

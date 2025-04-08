@@ -98,3 +98,26 @@ export const getUsersAPI = async () => {
       throw error
     }
   }
+
+  export const deleteElection = async (id:any) => {
+    try{
+      const endpoint = Endpoints.ELECTION.deleteElection.replace(":id", id.toString())
+      const response = await AxiosInstance.delete(endpoint);
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting election:", error)
+      throw error
+    }
+  }
+
+  export const updateElection = async (id: any, data: Partial<any>) => {
+    try {
+      const endpoint = Endpoints.ELECTION.updateElection.replace(":id", id.toString());
+      const response = await AxiosInstance.put(endpoint, data);
+      return response.data;
+    } catch (error) {
+      console.error("Error updating election:", error);
+      throw error;
+    }
+  };
+  

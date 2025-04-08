@@ -1,26 +1,14 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import {
-  Bold,
-  Italic,
-  Underline,
-  Strikethrough,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  List,
-  ListOrdered,
-  Link,
-  Type,
-  Code,
-  CheckCircle,
-} from "lucide-react"
+import { Bold, Italic, Underline, Strikethrough, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, Link, Type, Code, CheckCircle } from 'lucide-react'
 import type { Option } from "@/app/election/[id]/ballot/page"
 
 interface EditOptionDialogProps {
@@ -29,18 +17,95 @@ interface EditOptionDialogProps {
   questionTitle: string
   option: Option
   onSave: (option: Option) => void
+  onDelete: () => void
 }
 
-export function EditOptionDialog({ open, onOpenChange, questionTitle, option, onSave }: EditOptionDialogProps) {
-  const [editedOption, setEditedOption] = useState<Option>({ ...option })
+export function EditOptionDialog({
+  open,
+  onOpenChange,
+  questionTitle,
+  option,
+  onSave,
+  onDelete,
+}: EditOptionDialogProps) {
+  const [editedOption, setEditedOption] = useState<Option>({
+    ...option,
+    // Ensure we have both title and candidate_name for compatibility
+    title: option.title || option.candidate_name || "",
+    candidate_name: option.candidate_name || option.title || "",
+    short_description: option.short_description || option.candidate_bio || "",
+    candidate_bio: option.candidate_bio || option.short_description || "",
+    // Use image field
+    image: option.image || "",
+  })
 
-  const handleSave = () => {
-    onSave(editedOption)
+  // Add file upload functionality to the EditOptionDialog component
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [uploadError, setUploadError] = useState<string | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
+
+  // Add a function to handle file selection
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0])
+      setUploadError(null) // Clear any previous errors
+    }
   }
 
-  const handleDelete = () => {
-    // In a real app, you would call an API to delete the option
-    onOpenChange(false)
+  // Update the handleSave function to include the file
+  const handleSave = async () => {
+    // If there's a selected file, try to upload it
+    if (selectedFile) {
+      setIsUploading(true)
+      setUploadError(null)
+
+      try {
+        // Create a FormData object to send the file
+        const formData = new FormData()
+        formData.append("file", selectedFile)
+
+        // Make the API call to upload the file
+        const response = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        })
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || `Upload failed: ${response.status}`)
+        }
+
+        const data = await response.json()
+        console.log("Upload response:", data)
+
+        // Update the image URL with the uploaded file URL
+        onSave({
+          ...editedOption,
+          // Keep both fields in sync and ensure they're strings
+          title: editedOption.title || "",
+          candidate_name: editedOption.title || "",
+          short_description: editedOption.short_description || "",
+          candidate_bio: editedOption.short_description || "",
+          image: data.url, // Use the updated image URL
+        })
+      } catch (error: any) {
+        console.error("Error uploading file:", error)
+        setUploadError(error.message || "Failed to upload file. Please try again.")
+        setIsUploading(false)
+        // Don't save if the upload failed
+        return
+      }
+    } else {
+      // No file selected, just save the edited option
+      onSave({
+        ...editedOption,
+        // Keep both fields in sync and ensure they're strings
+        title: editedOption.title || "",
+        candidate_name: editedOption.title || "",
+        short_description: editedOption.short_description || "",
+        candidate_bio: editedOption.short_description || "",
+      })
+    }
   }
 
   return (
@@ -71,6 +136,7 @@ export function EditOptionDialog({ open, onOpenChange, questionTitle, option, on
                 setEditedOption({
                   ...editedOption,
                   title: e.target.value,
+                  candidate_name: e.target.value,
                 })
               }
             />
@@ -89,6 +155,7 @@ export function EditOptionDialog({ open, onOpenChange, questionTitle, option, on
                 setEditedOption({
                   ...editedOption,
                   short_description: e.target.value,
+                  candidate_bio: e.target.value,
                 })
               }
             />
@@ -160,24 +227,72 @@ export function EditOptionDialog({ open, onOpenChange, questionTitle, option, on
           <div>
             <Label className="font-semibold">Photo</Label>
             <div className="mt-1">
-              <Button variant="outline" className="w-full h-auto py-2 px-4 justify-start">
-                Choose File <span className="text-gray-500 ml-2">No file chosen</span>
-              </Button>
+              <input
+                type="file"
+                aria-label="Image"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="block w-full text-sm text-gray-500
+        file:mr-4 file:py-2 file:px-4
+        file:rounded-md file:border-0
+        file:text-sm file:font-semibold
+        file:bg-gray-50 file:text-gray-700
+        hover:file:bg-gray-100"
+              />
+              {selectedFile && <p className="text-sm text-green-600 mt-1">Selected: {selectedFile.name}</p>}
+              {!selectedFile && editedOption.image && (
+                <div className="mt-2">
+                  <p className="text-sm text-gray-500">Current photo:</p>
+                  <img
+                    src={editedOption.image || "/placeholder.svg"}
+                    alt="Option"
+                    className="mt-1 h-20 w-auto object-cover rounded-md"
+                  />
+                </div>
+              )}
+              {uploadError && <p className="text-sm text-red-500 mt-1">Error: {uploadError}</p>}
               <p className="text-sm text-gray-500 mt-1">Max file size: 2MB. Allowed types: jpg, gif, .png</p>
+              <p className="text-sm text-amber-500 mt-1">
+                Note: If image upload fails, you can still save the option without a new image.
+              </p>
             </div>
           </div>
         </div>
 
         <DialogFooter className="flex justify-between items-center">
-          <Button variant="destructive" onClick={handleDelete}>
+          <Button variant="destructive" onClick={onDelete}>
             Delete
           </Button>
-          <Button className="bg-green-500 hover:bg-green-600" onClick={handleSave}>
-            Save
-          </Button>
+          <div className="flex gap-2">
+            {uploadError && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  // Skip the file upload and just save the text fields
+                  onSave({
+                    ...editedOption,
+                    title: editedOption.title || "",
+                    candidate_name: editedOption.title || "",
+                    short_description: editedOption.short_description || "",
+                    candidate_bio: editedOption.short_description || "",
+                    // Keep the existing image
+                    image: editedOption.image || "",
+                  })
+                }}
+              >
+                Skip Upload & Save
+              </Button>
+            )}
+            <Button
+              className="bg-green-500 hover:bg-green-600"
+              onClick={handleSave}
+              disabled={(editedOption.title || "").trim() === "" || isUploading}
+            >
+              {isUploading ? "Uploading..." : "Save"}
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   )
 }
-

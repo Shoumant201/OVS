@@ -2,7 +2,7 @@
 
 import type React from "react"
 import Link from "next/link"
-import { Home, Settings, FileText, Users, Eye, Package } from "lucide-react"
+import { Home, Settings, FileText, Users, Eye, Package, Rocket  } from "lucide-react"
 import { DateTime } from "luxon"
 
 // Update the ElectionSidebar component to include the electionId prop and use it for navigation
@@ -11,7 +11,7 @@ interface ElectionSidebarProps {
   endDate: string
   votersCount: number
   electionId: string
-  activePage?: "overview" | "settings" | "ballot" | "voters" | "preview" | "addons"
+  activePage?: "overview" | "settings" | "ballot" | "voters" | "preview" | "addons" | "launch"
 }
 
 export function ElectionSidebar({
@@ -55,16 +55,22 @@ export function ElectionSidebar({
           active={activePage === "addons"}
           href={`/election/${electionId}/addons`}
         />
+        <NavItem
+          icon={<Rocket />}
+          label="Launch"
+          active={activePage === "launch"}
+          href={`/election/${electionId}/launch`}
+        />
       </nav>
 
       <div className="p-4 text-xs text-gray-400 mt-auto">
-        <div className="mb-2">
+        {/* <div className="mb-2">
           <div className="text-xs uppercase font-semibold mb-1">BASE PRICE</div>
           <div className="flex items-center">
             <span className="bg-green-500 text-white text-xs px-1 mr-1">FREE</span>
             <span>{votersCount} Voters</span>
           </div>
-        </div>
+        </div> */}
 
         <div className="mb-2">
           <div className="text-xs uppercase font-semibold mb-1">START DATE</div>

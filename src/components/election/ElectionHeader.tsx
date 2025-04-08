@@ -17,7 +17,7 @@ export function ElectionHeader({ title, status, votersCount }: ElectionHeaderPro
           <Badge className="ml-3 bg-gray-200 text-gray-700 font-normal">{status}</Badge>
         </div>
         <div className="flex items-center">
-          <Badge className="bg-green-500 text-white mr-2">FREE</Badge>
+          {/* <Badge className="bg-green-500 text-white mr-2">FREE</Badge> */}
           <span className="text-gray-600">{votersCount} Voters</span>
         </div>
       </div>

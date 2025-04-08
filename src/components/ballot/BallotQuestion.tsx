@@ -10,9 +10,18 @@ interface BallotQuestionProps {
   onAddOption: () => void
   onEditOption: (option: Option) => void
   onEditQuestion: () => void
+  onDeleteQuestion: () => void
+  onDeleteOption: (optionId: string) => void
 }
 
-export function BallotQuestion({ question, onAddOption, onEditOption, onEditQuestion }: BallotQuestionProps) {
+export function BallotQuestion({
+  question,
+  onAddOption,
+  onEditOption,
+  onEditQuestion,
+  onDeleteQuestion,
+  onDeleteOption,
+}: BallotQuestionProps) {
   return (
     <div className="border rounded-lg overflow-hidden">
       <div className="bg-gray-50 p-4 border-b flex justify-between items-start">
@@ -29,7 +38,9 @@ export function BallotQuestion({ question, onAddOption, onEditOption, onEditQues
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={onEditQuestion}>Edit Question</DropdownMenuItem>
             <DropdownMenuItem>Duplicate Question</DropdownMenuItem>
-            <DropdownMenuItem className="text-red-500">Delete Question</DropdownMenuItem>
+            <DropdownMenuItem className="text-red-500" onClick={onDeleteQuestion}>
+              Delete Question
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -77,9 +88,17 @@ export function BallotQuestion({ question, onAddOption, onEditOption, onEditQues
                   key={option.id}
                   className="flex items-center justify-between p-3 border rounded-md hover:bg-gray-50"
                 >
-                  <div className="flex items-center">
-                    <CheckCircle className="h-5 w-5 mr-3 text-gray-400" />
-                    <span>{option.title}</span>
+                  <div className="flex items-center gap-3">
+                    {option.image ? (
+                      <img
+                        src={option.image}
+                        alt={option.title || option.candidate_name}
+                        className="w-8 h-8 rounded-full object-cover border"
+                      />
+                    ) : (
+                      <CheckCircle className="h-5 w-5 text-gray-400" />
+                    )}
+                    <span>{option.title || option.candidate_name}</span>
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -90,7 +109,9 @@ export function BallotQuestion({ question, onAddOption, onEditOption, onEditQues
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onClick={() => onEditOption(option)}>Edit Option</DropdownMenuItem>
                       <DropdownMenuItem>Duplicate Option</DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-500">Delete Option</DropdownMenuItem>
+                      <DropdownMenuItem className="text-red-500" onClick={() => onDeleteOption(option.id)}>
+                        Delete Option
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -115,7 +136,7 @@ export function BallotQuestion({ question, onAddOption, onEditOption, onEditQues
             <div className="mt-4 p-3 bg-gray-50 rounded-md">
               <p className="text-sm">
                 <span className="font-semibold">Selection limits:</span> Voters must select between{" "}
-                {question.min_selections} and {question.max_selections} options.
+                {question.min_selections || 1} and {question.max_selections || 1} options.
               </p>
             </div>
           )}
@@ -123,7 +144,7 @@ export function BallotQuestion({ question, onAddOption, onEditOption, onEditQues
           <div className="mt-4 p-3 bg-gray-50 rounded-md">
             <p className="text-sm">
               <span className="font-semibold">Randomization:</span>{" "}
-              {question.randomize
+              {question.randomize || question.shuffle
                 ? "Options will be randomized for each voter."
                 : "Options will be displayed in the order shown."}
             </p>
@@ -141,4 +162,3 @@ export function BallotQuestion({ question, onAddOption, onEditOption, onEditQues
     </div>
   )
 }
-

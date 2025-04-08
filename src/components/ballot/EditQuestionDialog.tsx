@@ -28,18 +28,14 @@ interface EditQuestionDialogProps {
   onOpenChange: (open: boolean) => void
   question: Question
   onSave: (question: Question) => void
+  onDelete: () => void
 }
 
-export function EditQuestionDialog({ open, onOpenChange, question, onSave }: EditQuestionDialogProps) {
+export function EditQuestionDialog({ open, onOpenChange, question, onSave, onDelete }: EditQuestionDialogProps) {
   const [editedQuestion, setEditedQuestion] = useState<Question>({ ...question })
 
   const handleSave = () => {
     onSave(editedQuestion)
-  }
-
-  const handleDelete = () => {
-    // In a real app, you would call an API to delete the question
-    onOpenChange(false)
   }
 
   return (
@@ -182,11 +178,12 @@ export function EditQuestionDialog({ open, onOpenChange, question, onSave }: Edi
               <p className="text-sm text-gray-600">Randomly sorts the list of options on the ballot for each voter</p>
             </div>
             <Switch
-              checked={editedQuestion.randomize || false}
+              checked={editedQuestion.randomize || editedQuestion.shuffle || false}
               onCheckedChange={(checked) =>
                 setEditedQuestion({
                   ...editedQuestion,
                   randomize: checked,
+                  shuffle: checked,
                 })
               }
             />
@@ -194,7 +191,7 @@ export function EditQuestionDialog({ open, onOpenChange, question, onSave }: Edi
         </div>
 
         <DialogFooter className="flex justify-between items-center">
-          <Button variant="destructive" onClick={handleDelete}>
+          <Button variant="destructive" onClick={onDelete}>
             Delete
           </Button>
           <Button className="bg-green-500 hover:bg-green-600" onClick={handleSave}>
@@ -205,4 +202,3 @@ export function EditQuestionDialog({ open, onOpenChange, question, onSave }: Edi
     </Dialog>
   )
 }
-
