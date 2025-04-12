@@ -57,11 +57,15 @@ const LoginPage = () => {
 
       console.log("Login response:", response.data)
 
-      // Store the token securely in cookies
-      Cookies.set("token", response.data.token, { expires: 30 })
-
-      // Redirect to Dashboard
-      router.replace("/")
+      if (response.data.require2FA) {
+        // Store temporary token and redirect to OTP verification page
+        localStorage.setItem("tempToken", response.data.tempToken)
+        router.push("/verify-code")
+      } else {
+        // Store token and redirect to dashboard
+        Cookies.set("token", response.data.token, { expires: 30 })
+        router.push("/")
+      }
     } catch (error: any) {
       console.error("Login error:", error)
 
@@ -233,6 +237,11 @@ const LoginPage = () => {
                       >
                         {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                       </button>
+                    </div>
+                    <div className="flex justify-end -mt-2">
+                      <a href="/forgot-password" className="text-sm text-blue-500 hover:underline">
+                        Forgot password?
+                      </a>
                     </div>
                     <motion.button
                       type="submit"
@@ -568,4 +577,3 @@ const LoginPage = () => {
 }
 
 export default LoginPage
-
