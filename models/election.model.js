@@ -54,6 +54,11 @@ export const getAllElections = async () => {
     return result.rows;
 };
 
+export const getUserElections = async () => {
+    const result = await pool.query(`SELECT * FROM elections WHERE status = 'ongoing' OR status = 'scheduled' OR status = 'finished'`);
+    return result.rows;
+};
+
 export const updateElection = async (id, fields) => {
     const keys = Object.keys(fields);
   

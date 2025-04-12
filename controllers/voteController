@@ -1,0 +1,52 @@
+import { electionCheck, insertVote, voteCheck, voteCheck } from "../models/voteModel.js";
+
+
+export const voteCheckController = async (req, res) => {
+    try {
+        const { electionId } = req.params
+        const userId = req.user.id
+
+        const voteCheckData = await voteCheck(electionId, userId);
+        return res.json({ hasVoted: voteCheck.rows.length > 0 });
+      } catch (err) {
+        console.error("Detailed error:", err); // Log the full error details
+        res.status(500).json({ message: "Server error", error: err.message });
+      }
+};
+
+export const insertVoteController = async (req, res) => {
+    try{
+        const { election_id, votes } = req.body
+        const userId = req.user.id
+
+        // Check if user has already voted in this election
+        const voteCheck = await voteCheck(userId, election_id)
+
+        if (voteCheck.rows.length > 0) {
+        return res.status(403).json({
+            success: false,
+            message: "User has already voted in this election",
+        })
+        }
+
+        // Check if election is active
+        const electionCheck = await electionCheck(election_id)
+
+        if (electionCheck.rows.length === 0) {
+        return res.status(400).json({
+            success: false,
+            message: "Election is not active",
+        })
+        }
+
+        // Insert votes
+        for (const vote of votes) {
+        await insertVote(userId, election_id, vote.question_id, vote.candidate_id)
+        }
+
+        res.json({ success: true, message: "Votes submitted successfully" })
+    }catch (err) {
+        console.error(err.message)
+        res.status(500).json({ success: false, message: "Server error" })
+    }
+}

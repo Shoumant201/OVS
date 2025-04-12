@@ -17,6 +17,7 @@ import {
     deleteCandidate,
     updateQuestion,
     updateCandidate,
+    getUserElections,
 } from "../models/election.model.js";
 import { findUserById } from "../models/userModel.js";
 
@@ -167,6 +168,18 @@ export const getElectionByIdController = async (req, res) => {
 export const getAllElectionsController = async (req, res) => {
   try {
     const elections = await getAllElections();
+    res.json(elections);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message })
+    console.error("Detailed error:", err); // Log the full error details
+    res.status(500).json({ message: "Server error", error: err.message });
+    
+  }
+};
+
+export const getUserElectionsController = async (req, res) => {
+  try {
+    const elections = await getUserElections();
     res.json(elections);
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message })

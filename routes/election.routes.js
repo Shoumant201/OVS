@@ -18,6 +18,7 @@ import {
     updateQuestionController,
     updateCandidateController,
     createCandidateController,
+    getUserElectionsController,
 } from "../controllers/election.controller.js";
 import { authenticate } from "../middleware/authMiddleware.js"; // Fixed import
 import { isAdmin, hasRole } from "../middleware/admin.middleware.js";
@@ -54,8 +55,6 @@ router.delete(
 // Operations Regarding user for elections like registering in election,
 router.get("/:id/users", authenticate, isAdmin, hasRole(["super_admin", "commissioner"]), getUsersInElectionController);
 
-router.post("/:electionId/register", authenticate, registerUserForElectionController); // Register
-router.delete("/:electionId/unregister", authenticate, unregisterUserForElectionController);  // Unregister user
 
 router.post("/createQuestion", authenticate, isAdmin, hasRole(["super_admin", "commissioner", "admin"]), createQuestionController )
 router.post("/createCandidate", authenticate, isAdmin, hasRole(["super_admin", "commissioner", "admin"]), createCandidateController )
@@ -65,6 +64,7 @@ router.get("/getAllQuestions/:id", authenticate, getQuestionByElectionIdControll
 
 router.get("/getAllCandidates", authenticate, getAllCandidatesController);
 router.get("/getAllCandidates/:id", authenticate, getCandidatesByQuestionIdController);
+
 
 router.delete(
     "/deleteQuestion/:id",

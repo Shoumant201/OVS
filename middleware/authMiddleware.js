@@ -28,6 +28,11 @@ export const authenticate = (req, res, next) => {
       });
     }
 
+        // Check if token has require2FA flag
+    if (token.require2FA) {
+      return res.status(401).json({ message: "2FA verification required" })
+    }
+
     // Attach the user object from the token to the request
     req.user = user;
     next();
