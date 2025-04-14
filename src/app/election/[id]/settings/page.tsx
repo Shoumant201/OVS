@@ -4,34 +4,26 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { Settings, Calendar, Users, MessageSquare, Mail, PieChart, Copy, Trash2 } from "lucide-react"
+import { Settings, Calendar, Users, MessageSquare, Mail, PieChart, Copy, Trash2, Eye } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { ElectionLayout } from "@/components/election/ElectionLayout"
-import { deleteElection, getElectionById, updateElection } from "@/services/api/Authentication"
+import { getElectionById, updateVisibility, publishResult } from "@/services/api/Authentication"
 import type { Election } from "@/components/dashboard/ElectionCard"
 import withAuth from "@/hoc/withAuth"
-
-
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { AlertCircle } from "lucide-react"
 import {
-  AlertDialog,
-  AlertDialogTrigger,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction
-} from "@/components/ui/alert-dialog";
-import { DateTime } from 'luxon';
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { format } from "date-fns";
-
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 function SettingsPage() {
   const params = useParams()
@@ -45,17 +37,18 @@ function SettingsPage() {
   // Form states
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
-  const [start_date, setStartDate] = useState<Date | null>(null)
-  const [end_date, setEndDate] = useState<Date | null>(null)
-
+  const [startDate, setStartDate] = useState("")
+  const [endDate, setEndDate] = useState("")
   const [timezone, setTimezone] = useState("Asia/Kathmandu")
   const [hideResults, setHideResults] = useState(false)
   const [allowDuplicateWriteIn, setAllowDuplicateWriteIn] = useState(false)
 
-  const [showSuccessDialog, setShowSuccessDialog] = useState(false)
-  const [successMessage, setSuccessMessage] = useState("")
-
-  
+  // New state for publish results dialog
+  const [publishResultsDialogOpen, setPublishResultsDialogOpen] = useState(false)
+  const [adminPassword, setAdminPassword] = useState("")
+  const [adminPasswordError, setAdminPasswordError] = useState("")
+  const [saveSuccess, setSaveSuccess] = useState<string | null>(null)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   // Check for ID in localStorage if not in params
   useEffect(() => {
@@ -66,7 +59,7 @@ function SettingsPage() {
         router.replace(`/election/${storedId}/settings`)
       } else {
         console.error("No election ID available in settings page")
-        router.push("/dashboard")
+        router.push("/Dashboard")
       }
     }
   }, [id, router])
@@ -93,7 +86,11 @@ function SettingsPage() {
           setTitle(data.title)
           setDescription(data.description || "")
           setStartDate(data.start_date)
-          setEndDate(data.start_date)
+          setEndDate(data.end_date)
+
+          // Initialize results settings
+          setHideResults(data.hide_results || false)
+          setAllowDuplicateWriteIn(data.allow_duplicate_write_in || false)
         } else {
           console.error("Election not found in settings page")
         }
@@ -107,49 +104,91 @@ function SettingsPage() {
     fetchElection()
   }, [id])
 
-  const handleSaveGeneral =async () => {
-    const response = await updateElection(election?.id, {title,description});
-
-    console.log("Saving general settings:", { title, description })
-    setSuccessMessage("General settings saved successfully!")
-    setShowSuccessDialog(true)
-    // Show success message
-    
-  }
-
-  const handleSaveDates = async () => {
-
-    if (!start_date || !end_date) {
-      setSuccessMessage("Please select both start and end dates")
-      setShowSuccessDialog(true)
-      return
-    }
-
-    const formatedStartDate = DateTime.fromJSDate(start_date).toFormat("yyyy-MM-dd HH:mm:ss.SSS")
-    const formatedEndDate = DateTime.fromJSDate(end_date).toFormat("yyyy-MM-dd HH:mm:ss.SSS")
-    const response = await updateElection(election?.id, {start_date: formatedStartDate, end_date: formatedEndDate,});
-    console.log("Saving dates:", { formatedStartDate, formatedEndDate, timezone })
-    // Show success message
-    setSuccessMessage("Election dates saved successfully!")
-    setShowSuccessDialog(true)
-  }
-
-  const handleSaveResults = () => {
+  const handleSaveGeneral = () => {
     // In a real app, you would call an API to save the changes
-    console.log("Saving results settings:", { hideResults, allowDuplicateWriteIn })
+    console.log("Saving general settings:", { title, description })
     // Show success message
-    alert("Results settings saved successfully!")
+    setSaveSuccess("General settings saved successfully!")
+    setTimeout(() => setSaveSuccess(null), 3000)
   }
 
-  const handleDeleteElection = async () => {
+  const handleSaveDates = () => {
+    // In a real app, you would call an API to save the changes
+    console.log("Saving dates:", { startDate, endDate, timezone })
+    // Show success message
+    setSaveSuccess("Election dates saved successfully!")
+    setTimeout(() => setSaveSuccess(null), 3000)
+  }
+
+  const handleSaveResults = async () => {
     try {
-      const response = await deleteElection(election?.id);
-    // Redirect to dashboard
-      router.push("/Dashboard")
-    } catch (error){
-      console.error("Error deleting election:", error)
+      // In a real app, you would call an API to save the changes
+      console.log("Saving results settings:", { hideResults, allowDuplicateWriteIn })
+
+      // Update the hide results setting
+      if (election) {
+        await updateVisibility(election.id, hideResults)
+
+        // Update local state
+        setElection({
+          ...election,
+          hide_result: hideResults,
+        })
+
+        // Show success message
+        setSaveSuccess("Results settings saved successfully!")
+        setTimeout(() => setSaveSuccess(null), 3000)
+      }
+    } catch (error) {
+      console.error("Error saving results settings:", error)
+      setSaveError("Failed to save results settings. Please try again.")
+      setTimeout(() => setSaveError(null), 5000)
     }
-    
+  }
+
+  const handlePublishResults = async () => {
+    try {
+
+      // Update the election to publish results
+      if (election) {
+        await publishResult(election.id)
+
+        // Update local state
+        setElection({
+          ...election,
+          results_published: true,
+        })
+
+        setPublishResultsDialogOpen(false)
+        setAdminPassword("")
+
+        // Show success message
+        setSaveSuccess("Election results have been published successfully!")
+        setTimeout(() => setSaveSuccess(null), 3000)
+      }
+    } catch (error) {
+      console.error("Error publishing results:", error)
+      setSaveError("Failed to publish results. Please try again.")
+      setTimeout(() => setSaveError(null), 5000)
+    }
+  }
+
+  // Mock function to verify admin password - replace with actual API call
+  const verifyAdminPassword = async (pwd: string): Promise<boolean> => {
+    // In a real app, you would call an API endpoint to verify the admin password
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // For demo purposes, any password longer than 3 characters is "valid"
+        resolve(pwd.length > 3)
+      }, 1000)
+    })
+  }
+
+  const handleDeleteElection = () => {
+    // In a real app, you would call an API to delete the election
+    console.log("Deleting election:", election?.id)
+    // Redirect to dashboard
+    router.push("/dashboard")
   }
 
   if (loading) {
@@ -160,12 +199,30 @@ function SettingsPage() {
     return <div className="flex items-center justify-center h-screen">Election not found</div>
   }
 
+  const isElectionFinished = new Date(election.end_date) < new Date()
+
   return (
     <ElectionLayout election={election} activePage="settings">
       <div className="flex items-center mb-4">
         <Settings className="mr-2 h-5 w-5" />
         <h2 className="text-xl font-semibold">Settings</h2>
       </div>
+
+      {saveSuccess && (
+        <Alert className="mb-6 bg-green-50 border-green-200">
+          <AlertCircle className="h-4 w-4 text-green-600" />
+          <AlertTitle className="text-green-800">Success</AlertTitle>
+          <AlertDescription className="text-green-700">{saveSuccess}</AlertDescription>
+        </Alert>
+      )}
+
+      {saveError && (
+        <Alert className="mb-6" variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{saveError}</AlertDescription>
+        </Alert>
+      )}
 
       <div className="flex">
         {/* Left sidebar */}
@@ -362,19 +419,6 @@ function SettingsPage() {
                   Save
                 </Button>
               </div>
-              <AlertDialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Success</AlertDialogTitle>
-                      <AlertDialogDescription>{successMessage}</AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogAction onClick={() => setShowSuccessDialog(false)}>
-                        OK
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
             </div>
           )}
 
@@ -393,15 +437,13 @@ function SettingsPage() {
                       Start Date
                     </Label>
                     <div className="relative mt-1">
-                      <DatePicker
-                        selected={start_date ? new Date(start_date) : null}
-                        onChange={(date) => setStartDate(date)}
-                        showTimeSelect
-                        timeFormat="HH:mm"
-                        timeIntervals={15}
-                        dateFormat="LLL dd, yyyy, h:mm:ss a"
-                        className="pl-10 w-full border rounded-md py-2 px-3"
-                        placeholderText="Select start date and time"
+                      <Input
+                        id="start-date"
+                        type="text"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        className="pl-10"
+                        placeholder="March 30th, 2025 7:00 PM"
                       />
                       <Calendar className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                     </div>
@@ -412,15 +454,13 @@ function SettingsPage() {
                       End Date
                     </Label>
                     <div className="relative mt-1">
-                      <DatePicker
-                        selected={end_date ? new Date(end_date) : null}
-                        onChange={(date) => setEndDate(date)}
-                        showTimeSelect
-                        timeFormat="HH:mm"
-                        timeIntervals={15}
-                        dateFormat="LLL dd, yyyy, h:mm:ss a"
-                        className="pl-10 w-full border rounded-md py-2 px-3"
-                        placeholderText="Select end date and time"
+                      <Input
+                        id="end-date"
+                        type="text"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        className="pl-10"
+                        placeholder="April 28th, 2025 6:00 PM"
                       />
                       <Calendar className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                     </div>
@@ -428,10 +468,11 @@ function SettingsPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="timezone" className="font-medium">
+                  <Label htmlFor="timezone" className="font-medium">
                     Timezone
-                  </label>
+                  </Label>
                   <select
+                    title="timeone"
                     id="timezone"
                     value={timezone}
                     onChange={(e) => setTimezone(e.target.value)}
@@ -449,19 +490,6 @@ function SettingsPage() {
                   Save
                 </Button>
               </div>
-              <AlertDialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Success</AlertDialogTitle>
-                      <AlertDialogDescription>{successMessage}</AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogAction onClick={() => setShowSuccessDialog(false)}>
-                        OK
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
             </div>
           )}
 
@@ -479,8 +507,7 @@ function SettingsPage() {
                     <div>
                       <h4 className="font-medium">Hide Results During Election</h4>
                       <p className="text-sm text-gray-600 mt-1">
-                        Enabling this option will hide the election results from the election administrator until the
-                        election has ended. Voters will not be able to view election results regardless of this setting.
+                        Enabling this option will hide the election results from voters until you manually publish them.
                         This setting cannot be changed after your election launches.
                       </p>
                     </div>
@@ -501,8 +528,44 @@ function SettingsPage() {
                   </div>
                 </div>
 
+                {/* Publish Results Button - Only visible if results are hidden and election is finished */}
+                {hideResults && isElectionFinished && !election.results_published && (
+                  <div className="border rounded-md p-4 bg-blue-50">
+                    <div>
+                      <h4 className="font-medium flex items-center">
+                        <Eye className="h-4 w-4 mr-2" />
+                        Publish Election Results
+                      </h4>
+                      <p className="text-sm text-gray-600 mt-1 mb-3">
+                        This election has ended. You can now publish the results to make them visible to all voters.
+                      </p>
+                      <Button
+                        onClick={() => setPublishResultsDialogOpen(true)}
+                        className="bg-blue-600 hover:bg-blue-700"
+                      >
+                        Publish Results
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Results Status Indicator */}
+                {hideResults && election.results_published && (
+                  <div className="border rounded-md p-4 bg-green-50">
+                    <div>
+                      <h4 className="font-medium flex items-center text-green-700">
+                        <Eye className="h-4 w-4 mr-2" />
+                        Results Published
+                      </h4>
+                      <p className="text-sm text-green-600 mt-1">
+                        The results for this election have been published and are visible to all voters.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 <Button className="bg-green-500 hover:bg-green-600" onClick={handleSaveResults}>
-                  Save
+                  Save Settings
                 </Button>
               </div>
             </div>
@@ -522,30 +585,9 @@ function SettingsPage() {
                   if you need to make a change to an election that has already launched.
                 </p>
 
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="destructive" className="bg-red-600 hover:bg-red-700">
-                      Delete Election
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete the election.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        className="bg-red-600 hover:bg-red-700"
-                        onClick={handleDeleteElection}
-                      >
-                        Yes, delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                <Button variant="destructive" onClick={handleDeleteElection} className="bg-red-600 hover:bg-red-700">
+                  Delete Election
+                </Button>
               </div>
             </div>
           )}
@@ -562,6 +604,24 @@ function SettingsPage() {
           )}
         </div>
       </div>
+
+      {/* Publish Results Dialog */}
+      <Dialog open={publishResultsDialogOpen} onOpenChange={setPublishResultsDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Publish Election Results</DialogTitle>
+            <DialogDescription>
+              This will make the election results visible to all voters. Please confirm your admin password to continue.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPublishResultsDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handlePublishResults}>Publish Results</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </ElectionLayout>
   )
 }

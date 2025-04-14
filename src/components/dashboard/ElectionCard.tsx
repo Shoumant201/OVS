@@ -17,6 +17,8 @@ export interface Election {
   voters?: number
   ballot_questions?: number
   options?: number
+  hide_result?: boolean
+  results_published?: boolean
 }
 
 export function getElectionStatus(start_date: string, end_date: string): string {

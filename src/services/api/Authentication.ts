@@ -121,3 +121,37 @@ export const getUsersAPI = async () => {
     }
   };
   
+  export const updateVisibility = async (electionId: any, hideResult:any) => {
+    try{
+      const endpoint = Endpoints.ELECTION.updateVisibility.replace(":id", electionId)
+      const response = await AxiosInstance.put(endpoint,  {
+        hide_result: hideResult,
+      })
+      return response.data
+    } catch (err) {
+      console.error("Error updating hide result:", err);
+      throw err;
+    }
+  }
+
+  export const publishResult = async (electionId: any) => {
+    try{
+      const endpoint = Endpoints.ELECTION.publishResult.replace(":id", electionId)
+      const response = await AxiosInstance.post(endpoint)
+      return response.data
+    } catch (err) {
+      console.error("Error updating hide result:", err);
+      throw err;
+    }
+  }
+
+  export const launchElection = async (electionId: any) => {
+    try{
+      const endpoint = Endpoints.ELECTION.launchElection.replace(":id", electionId)
+      const response = await AxiosInstance.post(endpoint)
+      return response.data
+    } catch (err) {
+      console.error("Error launching Election:", err);
+      throw err;
+    }
+  }
