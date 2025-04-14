@@ -20,6 +20,9 @@ import {
     getUserElections,
 } from "../models/election.model.js";
 import { findUserById } from "../models/userModel.js";
+import {validationResult} from "express-validator"
+import pool from "../config/db.js";
+
 
 // Create election
 export const createElectionController = async (req, res) => {
@@ -446,3 +449,125 @@ export const unregisterUserForElectionController = async (req, res) => {
         });
     }
 };
+
+export const updateResultsVisibility = async (req, res) => {
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() })
+  }
+
+  const { id } = req.params
+  const { hide_result } = req.body
+  const userId = req.user.id
+
+  try {
+
+    // Update the election's hide_results setting
+    const result = await pool.query(
+      "UPDATE elections SET hide_result = $1, updated_at = NOW() WHERE id = $2 RETURNING *",
+      [hide_result, id],
+    )
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Election not found" })
+    }
+
+    res.json({
+      success: true,
+      message: "Results visibility updated successfully",
+      election: result.rows[0],
+    })
+  } catch (err) {
+    console.error("Error updating results visibility:", err)
+    res.status(500).json({ message: "Server error", error: err.message })
+  }
+}
+
+// Publish election results
+export const publishElectionResults = async (req, res) => {
+  const { id } = req.params
+
+  try {
+    // Check if user is admin or commissioner for this election
+    const userCheck = await pool.query(
+      "SELECT * FROM elections WHERE (id = $1)",
+      [id],
+    )
+
+    if (userCheck.rows.length === 0) {
+      return res.status(403).json({ message: "You don't have permission to publish results for this election" })
+    }
+
+    // Check if election has ended
+    const election = userCheck.rows[0]
+    const now = new Date()
+    const endDate = new Date(election.end_date)
+
+    if (now < endDate) {
+      return res.status(400).json({ message: "Cannot publish results before the election has ended" })
+    }
+
+    // Update the election to publish results
+    const result = await pool.query(
+      "UPDATE elections SET results_published = true, updated_at = NOW() WHERE id = $1 RETURNING *",
+      [id],
+    )
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Election not found" })
+    }
+
+    res.json({
+      success: true,
+      message: "Election results published successfully",
+      election: result.rows[0],
+    })
+  } catch (err) {
+    console.error("Error publishing election results:", err)
+    res.status(500).json({ message: "Server error", error: err.message })
+  }
+}
+
+export const launchElection = async (req, res) => {
+  const { id } = req.params
+
+  try {
+    // Check if user is admin or commissioner for this election
+    const userCheck = await pool.query(
+      "SELECT * FROM elections WHERE (id = $1)",
+      [id],
+    )
+
+    if (userCheck.rows.length === 0) {
+      return res.status(403).json({ message: "You don't have permission to publish results for this election" })
+    }
+
+    // Check if election has ended
+    const election = userCheck.rows[0]
+    const now = new Date()
+    const endDate = new Date(election.end_date)
+
+    if (now < endDate) {
+      return res.status(400).json({ message: "Cannot publish results before the election has ended" })
+    }
+
+    // Update the election to publish results
+    const result = await pool.query(
+      "UPDATE elections SET launched = true, updated_at = NOW() WHERE id = $1 RETURNING *",
+      [id],
+    )
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Election not found" })
+    }
+
+    res.json({
+      success: true,
+      message: "Election results published successfully",
+      election: result.rows[0],
+    })
+  } catch (err) {
+    console.error("Error publishing election results:", err)
+    res.status(500).json({ message: "Server error", error: err.message })
+  }
+}

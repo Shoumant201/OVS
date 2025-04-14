@@ -7,6 +7,7 @@ import adminRoutes from './routes/adminRoutes.js';
 import commissionerRoutes from './routes/commissionerRoutes.js';
 import electionRoutes from "./routes/election.routes.js"; 
 import voteRoutes from "./routes/voteRoutes.js"
+import reminderRoutes from "./routes/reminderRoutes.js"
 
 import { preventBannedUser } from './middleware/authMiddleware.js'; // Import preventBannedUser
 import session from 'express-session';
@@ -39,6 +40,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/commissioner', commissionerRoutes);
 app.use("/api/elections", electionRoutes); 
 app.use("/api/vote", voteRoutes);
+app.use("/api/remind", reminderRoutes)
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

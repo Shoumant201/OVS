@@ -19,6 +19,9 @@ import {
     updateCandidateController,
     createCandidateController,
     getUserElectionsController,
+    updateResultsVisibility,
+    publishElectionResults,
+    launchElection,
 } from "../controllers/election.controller.js";
 import { authenticate } from "../middleware/authMiddleware.js"; // Fixed import
 import { isAdmin, hasRole } from "../middleware/admin.middleware.js";
@@ -97,5 +100,17 @@ router.put(
     hasRole(["super_admin", "commissioner", "admin"]), // Only commissioner and admin allow update
     updateCandidateController
 );
+
+router.put(
+    "/:id/results-visibility",
+    authenticate,
+    updateResultsVisibility,
+    hasRole(["super_admin", "commissioner", "admin"])
+  )
+  
+  // Publish election results
+  router.post("/:id/publish",authenticate, publishElectionResults)
+
+  router.post("/:id/launch",authenticate, launchElection)
 
 export default router;

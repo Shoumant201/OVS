@@ -3,6 +3,8 @@ import { register, login, verifyEmail, forgotPassword, resetPassword, oauthLogin
 import passport from 'passport';
 import { createUserProfileController, update2FAByIdController, updateOnboardingByIdController } from '../controllers/userController.js';
 import { getCandidatesByQuestionIdController, getElectionByIdController, getQuestionByElectionIdController, getUserElectionsController } from '../controllers/election.controller.js';
+import { getUserFromToken } from '../utils/auth.js';
+import { verifyPassword } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -36,5 +38,7 @@ router.get(
 );
 
 router.post('/createUserProfile', createUserProfileController)
+
+router.post("/verify-password", getUserFromToken, verifyPassword)
 
 export default router;
