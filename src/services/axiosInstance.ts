@@ -1,4 +1,5 @@
 import axios from "axios"
+import Cookies from "js-cookie"
 
 // Create a custom axios instance with default configuration
 const axiosInstance = axios.create({
@@ -14,7 +15,8 @@ axiosInstance.interceptors.request.use(
   (config) => {
     // Get token from localStorage (client-side only)
     if (typeof window !== "undefined") {
-      const token = localStorage.getItem("token")
+      //const token = localStorage.getItem("token")
+      const token = Cookies.get("token")
       if (token) {
         config.headers.Authorization = `Bearer ${token}`
       }
@@ -35,10 +37,10 @@ axiosInstance.interceptors.response.use(
     // Handle 401 Unauthorized errors (token expired, etc.)
     if (error.response?.status === 401) {
       // Clear token and redirect to login if on client side
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("token")
-        window.location.href = "/auth/login"
-      }
+      // if (typeof window !== "undefined") {
+      //   localStorage.removeItem("token")
+      //   window.location.href = "/auth/login"
+      // }
     }
 
     // Handle 403 Forbidden errors

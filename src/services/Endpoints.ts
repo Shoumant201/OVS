@@ -13,6 +13,7 @@
       ENABLE_ONBOARDING: "/auth/onboarding",
       VERIFY_OTP: "/auth/verify-otp",
       RESEND_OTP: "/auth/resend-otp",
+      verifyPassword: "/auth/verify-password",
       // GOOGLE: "/auth/google",
       // GOOGLE_CALLBACK: "/auth/google/callback",
     },
@@ -25,7 +26,15 @@
     },
 
     VOTE: {
-      checkVote: "/vote/voteCheck",
+      checkVote: "/vote/status/:electionId",
+      submitVote: "/vote/",
+      getResults: "/vote/elections/:electionId/results"
+    },
+
+    REMINDER: {
+      setReminder: "/remind/elections/:electionId/reminder",
+      cancelReminder: "/remind/:reminderId",
+      getAllReminder: "/remind/"
     }
 
   }

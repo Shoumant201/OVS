@@ -7,11 +7,10 @@ import { Calendar, Users, CheckSquare, Clock, ArrowLeft, Share2, HelpCircle } fr
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { DateTime } from "luxon"
 import axiosInstance from "@/services/axiosInstance"
 import ENDPOINTS from "@/services/Endpoints"
+import { VotingForm } from "@/components/voting/VotingForm"
 
 interface Election {
     id: number
@@ -95,12 +94,13 @@ export default function ElectionDetailPage() {
           // Fetch candidates for each question
           const candidatesMap: Record<number, Candidate[]> = {}
   
-          const urlCandidate = ENDPOINTS.ELECTION.getCandidatesByQuestionId.replace(":id", id)
-          const candidate = await axiosInstance.get(urlCandidate)
-          console.log(candidate.data)
-          const candidatesData = candidate.data;
+          for (const q of questionsData) {
+            const urlCandidate = ENDPOINTS.ELECTION.getCandidatesByQuestionId.replace(":id", q.id.toString())
+            const candidateRes = await axiosInstance.get(urlCandidate)
+            candidatesMap[q.id] = candidateRes.data
+          }
   
-          setCandidates(candidatesData)
+          setCandidates(candidatesMap)
         } catch (error) {
           console.error("Error fetching election data:", error)
         } finally {
@@ -194,7 +194,6 @@ export default function ElectionDetailPage() {
         {/* Election Header */}
         <div className="bg-white rounded-lg border p-6 mb-6">
           <div className="flex flex-col md:flex-row gap-6">
-            
             <div className="flex-grow">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
                 <h2 className="text-2xl font-bold">{election.title}</h2>
@@ -244,44 +243,7 @@ export default function ElectionDetailPage() {
           {/* Left Column */}
           <div className="md:col-span-2 space-y-6">
             {/* Ballot Questions */}
-            <div className="bg-white rounded-lg border">
-              <div className="border-b px-6 py-4">
-                <h3 className="text-lg font-semibold">Ballot Questions</h3>
-              </div>
-              <div className="p-6">
-                {questions.map((question, index) => (
-                  <div key={question.id} className={index !== 0 ? "mt-6 pt-6 border-t" : ""}>
-                    <h4 className="font-semibold mb-2">
-                      {index + 1}. {question.title}
-                      <span className="ml-2 text-sm font-normal text-gray-500">({question.type})</span>
-                    </h4>
-                    {question.description && <p className="text-gray-600 mb-3 text-sm">{question.description}</p>}
-                    <ul className="space-y-2 pl-6">
-                      {candidates[question.id]?.map((candidate) => (
-                        <li key={candidate.id} className="text-gray-700">
-                          • {candidate.candidate_name}
-                          {candidate.candidate_bio && (
-                            <span className="text-gray-500 text-sm ml-2">({candidate.candidate_bio})</span>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-              <div className="border-t px-6 py-4 bg-gray-50 rounded-b-lg">
-                <div className="flex justify-end">
-                  {/* Update the button text based on status */}
-                  <Button disabled={election.status.toLowerCase() !== "ongoing"}>
-                    {election.status.toLowerCase() === "ongoing"
-                      ? "Vote Now"
-                      : election.status.toLowerCase() === "scheduled"
-                        ? "Not Open Yet"
-                        : "Voting Closed"}
-                  </Button>
-                </div>
-              </div>
-            </div>
+            <VotingForm electionId={id} questions={questions} candidates={candidates} electionStatus={election.status} startDate={election.start_date} />
           </div>
 
           {/* Right Column */}
