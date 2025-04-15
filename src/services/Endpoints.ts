@@ -16,6 +16,9 @@
       verifyPassword: "/auth/verify-password",
       // GOOGLE: "/auth/google",
       // GOOGLE_CALLBACK: "/auth/google/callback",
+
+      getProfile: "/auth/profile/:id",
+      updateProfile: "/auth/profile/:id",
     },
 
     ELECTION: {
