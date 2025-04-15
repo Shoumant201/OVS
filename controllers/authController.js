@@ -126,7 +126,7 @@ export const verifyOTP = async (req, res) => {
     // Generate full access token
     const token = jwt.sign(
       {
-        userId: user.id,
+        id: user.id,
         onboarding: user.onboarding,
       },
       process.env.JWT_SECRET,

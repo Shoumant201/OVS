@@ -1,4 +1,6 @@
 import pool from '../config/db.js';
+import bcrypt from 'bcrypt';
+
 
 export const createUser = async (name, email, hashedPassword) => {
     const result = await pool.query(
@@ -122,5 +124,148 @@ export const createUserProfile = async (
 
   return result.rows[0];
 };
+
+export const getUserProfile = async (id) => {
+  const result = await pool.query('SELECT * from user_profiles WHERE user_id = $1', [id]);
+  return result.rows[0];
+}
+
+// export const getUserProfile = async (userId) => {
+//   const userResult = await pool.query(
+//     `SELECT 
+//       u.name,
+//       u.email,
+//       u.is_2faenabled,
+//       p.full_name,
+//       p.phone,
+//       p.dob,
+//       p.gender,
+//       p.country,
+//       p.state,
+//       p.city,
+//       p.postal_code,
+//       p.ethnicity,
+//       p.occupation,
+//       p.education,
+//       p.profile_image
+//     FROM users u
+//     LEFT JOIN user_profiles p ON u.id = p.user_id
+//     WHERE u.id = $1`,
+//     [userId]
+//   );
+
+//   const user = userResult.rows[0];
+//   if (!user) return null;
+
+//   return {
+//     fullName: user.full_name || user.name,
+//     email: user.email,
+//     phoneNumber: user.phone || '',
+//     dateOfBirth: user.dob || '',
+//     gender: user.gender || '',
+//     country: user.country || '',
+//     state: user.state || '',
+//     city: user.city || '',
+//     postalCode: user.postal_code || '',
+//     ethnicity: user.ethnicity || '',
+//     occupation: user.occupation || '',
+//     educationLevel: user.education || '',
+//     image: user.profile_image || '',
+//     is_2faenabled: user.is_2faenabled,
+//   };
+// };
+
+export const updateUserProfile = async (userId, profileData) => {
+  // Update name in users table
+  await pool.query(
+    'UPDATE users SET name = $1 WHERE id = $2',
+    [profileData.fullName, userId]
+  );
+
+  // Check if profile exists
+  const existingProfile = await pool.query(
+    'SELECT * FROM user_profiles WHERE user_id = $1',
+    [userId]
+  );
+
+  if (existingProfile.rows.length > 0) {
+    // Update existing profile
+    await pool.query(
+      `UPDATE user_profiles SET
+        full_name = $1,
+        phone = $2,
+        dob = $3,
+        gender = $4,
+        country = $5,
+        state = $6,
+        city = $7,
+        postal_code = $8,
+        ethnicity = $9,
+        occupation = $10,
+        education = $11,
+        profile_image = $12
+      WHERE user_id = $13`,
+      [
+        profileData.fullName,
+        profileData.phoneNumber,
+        profileData.dateOfBirth,
+        profileData.gender,
+        profileData.country,
+        profileData.state,
+        profileData.city,
+        profileData.postalCode,
+        profileData.ethnicity,
+        profileData.occupation,
+        profileData.educationLevel,
+        profileData.image,
+        userId
+      ]
+    );
+  } else {
+    // Insert new profile
+    await pool.query(
+      `INSERT INTO user_profiles (
+        user_id, full_name, phone, dob, gender, country, state,
+        city, postal_code, ethnicity, occupation, education, profile_image
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6, $7,
+        $8, $9, $10, $11, $12, $13
+      )`,
+      [
+        userId,
+        profileData.fullName,
+        profileData.phoneNumber,
+        profileData.dateOfBirth,
+        profileData.gender,
+        profileData.country,
+        profileData.state,
+        profileData.city,
+        profileData.postalCode,
+        profileData.ethnicity,
+        profileData.occupation,
+        profileData.educationLevel,
+        profileData.image
+      ]
+    );
+  }
+
+  return { message: 'Profile updated successfully' };
+};
+
+
+// export const updateUserPassword1 = async (userId, newPassword) => {
+//   const hashedPassword = await bcrypt.hash(newPassword, 10);
+//   const result = await pool.query(
+//     'UPDATE users SET password = $1 WHERE id = $2 RETURNING *',
+//     [hashedPassword, userId]
+//   );
+//   return result.rows[0];
+// };
+
+
+
+// export const verifyPassword = async (plainPassword, hashedPassword) => {
+//   return bcrypt.compare(plainPassword, hashedPassword);
+// };
 
 

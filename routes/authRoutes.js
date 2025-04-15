@@ -1,10 +1,11 @@
 import express from 'express';
 import { register, login, verifyEmail, forgotPassword, resetPassword, oauthLogin, verifyOTP, resendOTP } from '../controllers/authController.js';
 import passport from 'passport';
-import { createUserProfileController, update2FAByIdController, updateOnboardingByIdController } from '../controllers/userController.js';
+import { createUserProfileController, getUserProfileController, update2FAByIdController, updateOnboardingByIdController, updateUserProfileController } from '../controllers/userController.js';
 import { getCandidatesByQuestionIdController, getElectionByIdController, getQuestionByElectionIdController, getUserElectionsController } from '../controllers/election.controller.js';
 import { getUserFromToken } from '../utils/auth.js';
 import { verifyPassword } from '../middleware/authMiddleware.js';
+import { updateUserProfile } from '../models/userModel.js';
 
 const router = express.Router();
 
@@ -38,6 +39,9 @@ router.get(
 );
 
 router.post('/createUserProfile', createUserProfileController)
+
+router.get("/profile/:id", getUserProfileController)
+router.put("/profile/:id", updateUserProfileController)
 
 router.post("/verify-password", getUserFromToken, verifyPassword)
 
