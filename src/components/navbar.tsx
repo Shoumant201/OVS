@@ -1,22 +1,29 @@
-"use client"
+'use client'
+
 import { useEffect, useState } from "react"
 import { Button } from "./ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useRouter } from "next/navigation"
 import Cookies from "js-cookie"
-import axios from "axios"
-import ENDPOINTS from "@/services/Endpoints"
 import axiosInstance from "@/services/axiosInstance"
 import { jwtDecode } from "jwt-decode"
+import { LanguageSwitcher } from "./language-switcher"
+import { type Locale } from "@/lib/dictionary"
+import ENDPOINTS from "@/services/Endpoints"
 
 interface UserProfile {
   full_name: string
   profile_image?: string
 }
 
-
-const Navbar = () => {
+const Navbar = ({
+  locale,
+  dictionary,
+}: {
+  locale: Locale
+  dictionary: any
+}) => {
   const router = useRouter()
   const [user, setUser] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
@@ -30,17 +37,11 @@ const Navbar = () => {
           return
         }
 
-        const decoded = jwtDecode<{id: string}>(token);
+        const decoded = jwtDecode<{ id: string }>(token)
         const id = decoded.id
-
-        console.log(id)
-
         const url = ENDPOINTS.AUTH.getProfile.replace(":id", id)
         const response = await axiosInstance.get(url)
-
         setUser(response.data.user)
-        console.log("test",response.data.user)
-        console.log("test1",user)
       } catch (error) {
         console.error("Error fetching user profile:", error)
       } finally {
@@ -51,18 +52,11 @@ const Navbar = () => {
     fetchUserProfile()
   }, [])
 
-  useEffect(() => {
-    if (user) {
-      console.log("User data updated:", user)
-    }
-  }, [user])
-
   const handleLogout = () => {
     Cookies.remove("token")
     router.replace("/login")
   }
 
-  // Get initials for avatar fallback
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -76,7 +70,10 @@ const Navbar = () => {
     <header className="bg-white border-b">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <div className="flex items-center">
-          <h1 onClick={() => router.push("/")} className="text-2xl font-bold text-[#26C6B0] cursor-pointer">
+          <h1
+            onClick={() => router.push("/")}
+            className="text-2xl font-bold text-[#26C6B0] cursor-pointer"
+          >
             Online Voting System
           </h1>
         </div>
@@ -87,7 +84,7 @@ const Navbar = () => {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="rounded-full h-10 w-10 p-0">
                   <Avatar>
-                    <AvatarImage src={user.profile_image || "/placeholder.svg?height=40&width=40"} alt={user.full_name} />
+                    <AvatarImage src={user.profile_image || "/placeholder.svg"} alt={user.full_name} />
                     <AvatarFallback>{user.full_name ? getInitials(user.full_name) : "U"}</AvatarFallback>
                   </Avatar>
                 </Button>
@@ -98,6 +95,7 @@ const Navbar = () => {
                 <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            <LanguageSwitcher locale={locale} dictionary={dictionary} />
           </div>
         )}
       </div>

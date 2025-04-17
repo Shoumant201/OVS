@@ -1,0 +1,37 @@
+{
+    "common": {
+      "title": "Online Voting System",
+      "language": "Language",
+      "english": "English",
+      "nepali": "Nepali"
+    },
+    "nav": {
+      "home": "Home",
+      "vote": "Vote Now",
+      "results": "Results",
+      "login": "Login",
+      "register": "Register",
+      "logout": "Logout"
+    },
+    "home": {
+      "welcome": "Welcome to the Online Voting System",
+      "description": "A secure and transparent platform for casting your vote",
+      "getStarted": "Get Started"
+    },
+    "vote": {
+      "title": "Cast Your Vote",
+      "selectCandidate": "Select a candidate",
+      "submit": "Submit Vote",
+      "success": "Your vote has been recorded",
+      "alreadyVoted": "You have already voted"
+    },
+    "auth": {
+      "email": "Email",
+      "password": "Password",
+      "login": "Login",
+      "register": "Register",
+      "name": "Full Name",
+      "confirmPassword": "Confirm Password"
+    }
+  }
+  

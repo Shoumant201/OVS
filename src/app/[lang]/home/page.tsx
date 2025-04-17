@@ -10,6 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { DateTime } from "luxon"
 import axiosInstance from "@/services/axiosInstance"
 import ENDPOINTS from "@/services/Endpoints"
+import { type Locale } from '@/lib/dictionary'
 
 interface Election {
   id: number
@@ -28,7 +29,13 @@ interface Election {
   launched: boolean
 }
 
-export default function ElectionsPage() {
+export default function ElectionsPage({
+  dictionary,
+  locale,
+}: {
+  dictionary: any
+  locale: Locale
+}) {
   const router = useRouter()
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<string | null>(null)
@@ -71,7 +78,7 @@ export default function ElectionsPage() {
 
 
   const handleElectionClick = (id: number) => {
-    router.push(`/home/${id}`)
+    router.push(`/${locale}/home/${id}`)
   }
 
   const getStatusColor = (status: string) => {
