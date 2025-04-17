@@ -1,4 +1,3 @@
-import Image from "next/image";
 import DashboardPage from "./Dashboard/page"
 
 export const metadata = {
