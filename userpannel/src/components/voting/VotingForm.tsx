@@ -286,7 +286,7 @@ export function VotingForm({ electionId, questions, candidates, electionStatus, 
 
   if (electionStatus === "ongoing" && hasVoted) {
     return (
-      <Alert className="mb-6 bg-amber-50 border-amber-200">
+      <Alert className="mb-6 bg-amber-50 border-amber-200 dark:bg-black">
         <Info className="h-5 w-5 text-amber-600" />
         <AlertTitle className="text-amber-800">Already Voted</AlertTitle>
         <AlertDescription className="text-amber-700">

@@ -3,6 +3,7 @@ import "./globals.css";
 import { getDictionary, type Locale } from "@/lib/dictionary";
 import { locales } from "../../../middleware";
 import LayoutWrapper from "@/components/layout-wrapper"; // NEW COMPONENT
+import { ThemeProvider } from "../../../theme-context";
 
 export const metadata: Metadata = {
   title: "Online Voting System",
@@ -25,9 +26,11 @@ export default async function RootLayout({
   return (
     <html lang={lang}>
       <body className="antialiased">
-        <LayoutWrapper lang={lang} dictionary={dictionary}>
-          {children}
-        </LayoutWrapper>
+        <ThemeProvider>
+          <LayoutWrapper lang={lang} dictionary={dictionary}>
+              {children}
+          </LayoutWrapper>
+        </ThemeProvider>
       </body>
     </html>
   );

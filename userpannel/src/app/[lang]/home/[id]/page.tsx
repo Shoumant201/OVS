@@ -11,6 +11,7 @@ import { DateTime } from "luxon"
 import axiosInstance from "@/services/axiosInstance"
 import ENDPOINTS from "@/services/Endpoints"
 import { VotingForm } from "@/components/voting/VotingForm"
+import { type Locale } from "@/lib/dictionary"
 
 interface Election {
     id: number
@@ -62,7 +63,14 @@ interface Election {
     updated_at: string
   }
 
-export default function ElectionDetailPage() {
+export default function ElectionDetailPage({
+  locale,
+  dictionary,
+}: {
+  dictionary: any
+  locale: Locale
+  
+}) {
     const router = useRouter()
     const params = useParams()
     const id = params?.id as string
@@ -159,7 +167,7 @@ export default function ElectionDetailPage() {
       case "ongoing":
         return "bg-green-100 text-green-800"
       case "finished":
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800 dark:bg-[#121212] dark:text-white"
       default:
         return "bg-gray-100 text-gray-800"
     }
@@ -167,7 +175,7 @@ export default function ElectionDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center dark:bg-[#121212]">
         <p>Loading election details...</p>
       </div>
     )
@@ -175,24 +183,24 @@ export default function ElectionDetailPage() {
 
   if (!election) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center dark:bg-[#121212]">
         <p>Election not found</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#121212]">
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         {/* Back button */}
-        <Button variant="ghost" className="mb-6 flex items-center gap-2" onClick={() => router.push("/home")}>
+        <Button variant="ghost" className="mb-6 flex items-center gap-2" onClick={() => router.push(`/${locale}/home`)}>
           <ArrowLeft className="h-4 w-4" />
           Back to Elections
         </Button>
 
         {/* Election Header */}
-        <div className="bg-white rounded-lg border p-6 mb-6">
+        <div className="bg-white rounded-lg border p-6 mb-6 dark:bg-black">
           <div className="flex flex-col md:flex-row gap-6">
             <div className="flex-grow">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
@@ -224,7 +232,7 @@ export default function ElectionDetailPage() {
         </div>
 
         {/* Election Progress */}
-        <div className="bg-white rounded-lg border p-6 mb-6">
+        <div className="bg-white rounded-lg border p-6 mb-6 dark:bg-black">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-lg font-semibold flex items-center">
               <Clock className="h-5 w-5 mr-2" />
@@ -249,7 +257,7 @@ export default function ElectionDetailPage() {
           {/* Right Column */}
           <div className="space-y-6">
             {/* Election Details */}
-            <div className="bg-white rounded-lg border">
+            <div className="bg-white rounded-lg border dark:bg-black">
               <div className="border-b px-6 py-4">
                 <h3 className="text-lg font-semibold">Election Details</h3>
               </div>
@@ -278,7 +286,7 @@ export default function ElectionDetailPage() {
             </div>
 
             {/* Actions */}
-            <div className="bg-white rounded-lg border">
+            <div className="bg-white rounded-lg border dark:bg-black">
               <div className="border-b px-6 py-4">
                 <h3 className="text-lg font-semibold">Actions</h3>
               </div>
@@ -295,7 +303,7 @@ export default function ElectionDetailPage() {
             </div>
 
             {/* Important Dates */}
-            <div className="bg-white rounded-lg border">
+            <div className="bg-white rounded-lg border dark:bg-black">
               <div className="border-b px-6 py-4">
                 <h3 className="text-lg font-semibold">Important Dates</h3>
               </div>

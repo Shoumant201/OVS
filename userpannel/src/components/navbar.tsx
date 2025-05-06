@@ -11,6 +11,7 @@ import { jwtDecode } from "jwt-decode"
 import { LanguageSwitcher } from "./language-switcher"
 import { type Locale } from "@/lib/dictionary"
 import ENDPOINTS from "@/services/Endpoints"
+import ThemeToggle from "./themeToggle"
 
 interface UserProfile {
   full_name: string
@@ -67,11 +68,11 @@ const Navbar = ({
   }
 
   return (
-    <header className="bg-white border-b">
+    <header className="bg-white border-b dark:bg-black">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <div className="flex items-center">
           <h1
-            onClick={() => router.push("/")}
+            onClick={() => router.push(`/${locale}/`)}
             className="text-2xl font-bold text-[#26C6B0] cursor-pointer"
           >
             Online Voting System
@@ -79,7 +80,7 @@ const Navbar = ({
         </div>
         {!loading && user && (
           <div className="flex items-center gap-4">
-            <span className="text-gray-700">{user.full_name}</span>
+            <span className="text-gray-700 dark:text-amber-50">{user.full_name}</span>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="rounded-full h-10 w-10 p-0">
@@ -96,6 +97,7 @@ const Navbar = ({
               </DropdownMenuContent>
             </DropdownMenu>
             <LanguageSwitcher locale={locale} dictionary={dictionary} />
+            <ThemeToggle/>
           </div>
         )}
       </div>

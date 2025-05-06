@@ -95,7 +95,7 @@ export default function ElectionsPage({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#121212]">
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
@@ -143,7 +143,7 @@ export default function ElectionsPage({
             {filteredElections.map((election) => (
               <div
                 key={election.id}
-                className="bg-white rounded-lg border hover:shadow-md transition-shadow cursor-pointer"
+                className="bg-white rounded-lg border hover:shadow-md transition-shadow cursor-pointer dark:bg-[#292828]"
                 onClick={() => handleElectionClick(election.id)}
               >
                 <div className="p-6">
@@ -175,7 +175,7 @@ export default function ElectionsPage({
                     </div>
                   </div>
                 </div>
-                <div className="border-t px-6 py-3 bg-gray-50 rounded-b-lg">
+                <div className="border-t px-6 py-3 bg-gray-50 rounded-b-lg dark:bg-[#3b3b3b]">
                   <div className="flex justify-end">
                     <Button className="bg-[#26C6B0] hover:bg-[#269bc6] ">
                       {election.status.toLowerCase() === "ongoing"
