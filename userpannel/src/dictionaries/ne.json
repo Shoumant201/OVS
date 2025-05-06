@@ -1,37 +1,272 @@
 {
-    "common": {
-      "title": "अनलाइन मतदान प्रणाली",
-      "language": "भाषा",
-      "english": "अंग्रेजी",
-      "nepali": "नेपाली"
-    },
-    "nav": {
-      "home": "गृहपृष्ठ",
-      "vote": "मतदान गर्नुहोस्",
-      "results": "परिणामहरू",
-      "login": "लगइन",
-      "register": "दर्ता गर्नुहोस्",
-      "logout": "लगआउट"
-    },
-    "home": {
-      "welcome": "अनलाइन मतदान प्रणालीमा स्वागत छ",
-      "description": "तपाईंको मत हाल्नको लागि सुरक्षित र पारदर्शी प्लेटफर्म",
-      "getStarted": "सुरु गर्नुहोस्"
-    },
-    "vote": {
-      "title": "मतदान गर्नुहोस्",
-      "selectCandidate": "उम्मेदवार छान्नुहोस्",
-      "submit": "मत पेश गर्नुहोस्",
-      "success": "तपाईंको मत दर्ता गरिएको छ",
-      "alreadyVoted": "तपाईंले पहिले नै मतदान गरिसक्नुभएको छ"
-    },
-    "auth": {
-      "email": "इमेल",
-      "password": "पासवर्ड",
-      "login": "लगइन",
-      "register": "दर्ता गर्नुहोस्",
-      "name": "पूरा नाम",
-      "confirmPassword": "पासवर्ड सुनिश्चित गर्नुहोस्"
-    }
+  "forgot-password": {
+    "title": "पासवर्ड बिर्सनुभयो",
+    "placeholderEmail": "आफ्नो इमेल प्रविष्ट गर्नुहोस्",
+    "buttonSending": "पठाउँदै...",
+    "buttonSendResetLink": "रिसेट लिङ्क पठाउनुहोस्",
+    "successMessage": "रिसेट लिङ्क पठाइएको छ। कृपया आफ्नो इनबक्स जाँच गर्नुहोस्।",
+    "errorMessage": "केही गडबडी भयो"
+  },
+  "elections-page": {
+    "title": "उपलब्ध निर्वाचनहरू",
+    "subtitle": "तपाईं योग्य हुनु भएको निर्वाचनहरूमा सहभागी हुनुहोस् र ब्राउज गर्नुहोस्",
+    "searchPlaceholder": "निर्वाचन खोज्नुहोस्...",
+    "filterButton": "सबै स्थिति",
+    "filterAll": "सबै स्थिति",
+    "filterScheduled": "निर्धारित",
+    "filterOngoing": "चालु",
+    "filterFinished": "समाप्त",
+    "loading": "निर्वाचनहरू लोड हुँदैछन्...",
+    "noElections": "तपाईंको खोज अनुसार कुनै निर्वाचन भेटिएन",
+    "voteNow": "भोट हाल्नुहोस्",
+    "viewDetails": "विवरण हेर्नुहोस्",
+    "viewResults": "नतिजा हेर्नुहोस्",
+    "voters": "मतदाता",
+    "questions": "प्रश्नहरू"
+  },
+  "vote-page": {
+    "loadingElectionData": "निर्वाचन डेटा लोड गर्दै...",
+    "backToElections": "निर्वाचनहरूमा फर्कनुहोस्",
+    "backToElectionDetails": "निर्वाचन विवरणमा फर्कनुहोस्",
+    "errorTitle": "त्रुटि",
+    "errorElectionNotFound": "निर्वाचन फेला परेन",
+    "errorNotStarted": "यो निर्वाचन अझै सुरु भएको छैन",
+    "errorEnded": "यो निर्वाचन समाप्त भइसकेको छ",
+    "errorGeneric": "निर्वाचन डेटा लोड गर्न असफल",
+    "returnToElections": "निर्वाचनहरूमा फर्कनुहोस्"
+  },
+  "results-page": {
+    "loadingElectionResults": "निर्वाचन परिणाम लोड गर्दै...",
+    "backToElections": "निर्वाचनहरूमा फर्कनुहोस्",
+    "backToElectionDetails": "निर्वाचन विवरणमा फर्कनुहोस्",
+    "errorTitle": "त्रुटि",
+    "errorElectionNotFound": "निर्वाचन फेला परेन",
+    "errorLiveResultsHidden": "यो निर्वाचनका प्रत्यक्ष परिणाम लुकेको छ।",
+    "errorResultsLoadFailed": "निर्वाचन परिणाम लोड गर्न असफल",
+    "returnToElections": "निर्वाचनहरूमा फर्कनुहोस्",
+    "liveResultsMessage": "प्रत्यक्ष परिणामहरू देखाइरहेका छन्। यी परिणामहरू निर्वाचनको समाप्ति सम्म परिवर्तन हुन सक्छ।",
+    "electionEndedOn": "निर्वाचन समाप्त भएको मिति",
+    "resultsNotAvailable": "परिणाम उपलब्ध छैन",
+    "resultsNotAvailableMessage": "यो निर्वाचनका परिणामहरू अझै उपलब्ध छैन। परिणामहरू निर्वाचन समाप्त भएपछि प्रकाशित गरिनेछ।"
+  },
+  "election-detail": {
+    "back-to-elections": "निर्वाचनहरूमा फर्कनुहोस्",
+    "loading-election-details": "निर्वाचन विवरण लोड हुँदै...",
+    "election-not-found": "निर्वाचन फेला परेन",
+    "starts-in": "शुरु हुन्छ",
+    "ends-in": "समाप्त हुन्छ",
+    "election-status": "निर्वाचन स्थिति",
+    "voters": "योग्य मतदाता",
+    "ballot-questions": "मतपेटिका प्रश्नहरू",
+    "organizer": "आयोजक",
+    "location": "स्थान",
+    "eligibility": "योग्यता",
+    "organizer-contact": "आयोजक सम्पर्क",
+    "share-election": "निर्वाचन सेयर गर्नुहोस्",
+    "get-help": "सहायता प्राप्त गर्नुहोस्",
+    "registration-deadline": "दर्ता समाप्ति मिति",
+    "voting-opens": "मतदान खुल्छ",
+    "voting-closes": "मतदान बन्द हुन्छ",
+    "results-announced": "परिणाम घोषणा गरिने मिति",
+    "election-details": "निर्वाचन विवरण"
+  },
+  "election-status": {
+    "scheduled": "निर्धारित",
+    "ongoing": "चलिरहेको",
+    "finished": "समाप्त"
+  },
+  "progress-bar": {
+    "progress": "प्रगति"
+  },
+  "two-fa": {
+    "secureVotingAccess": "तपाईंको मतदान पहुँच सुरक्षित गर्नुहोस्",
+    "chooseVerificationMethod": "एकपटक प्रयोग हुने प्रमाणीकरण कोड कसरी प्राप्त गर्ने भन्ने छनोट गर्नुहोस्।",
+    "email": "इमेल",
+    "emailDescription": "कोड तपाईंको इमेलमा पठाइनेछ।",
+    "no2FA": "२FA प्रयोग नगर्नुहोस्",
+    "no2FADescription": "सिफारिस गरिएको छैन - तपाईंको खाता कम सुरक्षित हुन सक्छ।",
+    "continue": "जारी राख्नुहोस्"
+  },
+  "basic-info": {
+    "title": "प्रयोगकर्ताको आधारभूत जानकारी",
+    "noImage": "तस्बिर छैन",
+    "uploading": "अपलोड हुँदैछ...",
+    "fullName": "पुरा नाम",
+    "email": "इमेल",
+    "phone": "फोन नम्बर",
+    "dob": "जन्म मिति",
+    "gender": "लिङ्ग",
+    "selectGender": "लिङ्ग चयन गर्नुहोस्",
+    "male": "पुरुष",
+    "female": "महिला",
+    "otherGender": "अन्य",
+    "country": "देश",
+    "state": "प्रदेश/क्षेत्र",
+    "city": "शहर",
+    "postalCode": "हुलाक नम्बर",
+    "ethnicity": "जातीयता",
+    "occupation": "पेशा",
+    "selectOccupation": "पेशा चयन गर्नुहोस्",
+    "student": "विद्यार्थी",
+    "employedFull": "पूर्णकालिक जागिर",
+    "employedPart": "अंशकालिक जागिर",
+    "selfEmployed": "स्व-रोजगार",
+    "unemployed": "बेरोजगार",
+    "retired": "सेवानिवृत्त",
+    "homemaker": "गृहिणी",
+    "freelancer": "फ्रिलान्सर",
+    "otherOccupation": "अन्य",
+    "education": "शिक्षा",
+    "selectEducation": "शिक्षा स्तर चयन गर्नुहोस्",
+    "noFormal": "औपचारिक शिक्षा छैन",
+    "primary": "प्राथमिक विद्यालय",
+    "secondary": "माध्यमिक विद्यालय",
+    "highSchool": "उच्च विद्यालय प्रमाणपत्र",
+    "associate": "एसोसिएट डिग्री",
+    "bachelor": "स्नातक डिग्री",
+    "master": "स्नातकोत्तर डिग्री",
+    "phd": "विद्या वाचस्पति (PhD)",
+    "otherEducation": "अन्य",
+    "continue": "अगाडि बढ्नुहोस्"
+  },
+  "reset-password": {
+    "title": "पासवर्ड रिसेट गर्नुहोस्",
+    "newPassword": "नयाँ पासवर्ड",
+    "confirmNewPassword": "नयाँ पासवर्ड पुन: पुष्टि गर्नुहोस्",
+    "button": "पासवर्ड रिसेट गर्नुहोस्",
+    "resetting": "रिसेट गरिँदैछ...",
+    "passwordMismatch": "पासवर्डहरू मिलेनन्",
+    "success": "पासवर्ड सफलतापूर्वक रिसेट गरियो! पुन: निर्देशन हुँदैछ...",
+    "error": "केही समस्या आयो"
+  },
+  "account-settings": {
+    "accountSettings": "खाता सेटिङ"
+  },
+  "tabs": {
+    "profileInformation": "प्रोफाइल जानकारी",
+    "security": "सुरक्षा",
+    "preferences": "प्राथमिकताहरू"
+  },
+  "profile-information": {
+    "title": "प्रोफाइल जानकारी",
+    "description": "आफ्नो व्यक्तिगत जानकारी र प्रोफाइल तस्बिर अद्यावधिक गर्नुहोस्",
+    "fullName": "पूरा नाम",
+    "email": "इमेल ठेगाना",
+    "phoneNumber": "फोन नम्बर",
+    "dateOfBirth": "जन्म मिति",
+    "gender": "लिङ्ग",
+    "country": "देश",
+    "state": "राज्य",
+    "city": "शहर",
+    "postalCode": "हुलाक कोड",
+    "ethnicity": "जातीयता",
+    "occupation": "पेशा",
+    "educationLevel": "शैक्षिक स्तर",
+    "changeProfilePicture": "प्रोफाइल तस्बिर परिवर्तन गर्नुहोस्"
+  },
+  "messages": {
+    "error": "त्रुटि",
+    "success": "सफलता",
+    "profileUpdated": "प्रोफाइल सफलतापूर्वक अद्यावधिक गरियो",
+    "profileUpdateFailed": "प्रोफाइल अद्यावधिक गर्न असफल भयो",
+    "passwordUpdated": "पासवर्ड सफलतापूर्वक अद्यावधिक गरियो",
+    "passwordUpdateFailed": "पासवर्ड अद्यावधिक गर्न असफल भयो",
+    "passwordMismatch": "नयाँ पासवर्डहरू मिलेनन्",
+    "passwordLength": "पासवर्ड कम्तिमा ८ अक्षरको हुनुपर्छ",
+    "2faEnabled": "टू-फ्याक्टर प्रमाणीकरण सफलतापूर्वक सक्षम गरियो",
+    "2faDisabled": "टू-फ्याक्टर प्रमाणीकरण सफलतापूर्वक अक्षम गरियो",
+    "2faError": "टू-फ्याक्टर प्रमाणीकरण सेटिङ अद्यावधिक गर्न असफल भयो"
+  },
+  "verify-page": {
+    "verifyingEmail": "तपाईंको इमेल प्रमाणिकरण हुँदैछ...",
+    "emailVerified": "✅ इमेल सफलतापूर्वक प्रमाणिकरण गरियो!",
+    "redirectingLogin": "लगइनमा पुनः निर्देशित गरिँदै...",
+    "verificationFailed": "❌ प्रमाणिकरण असफल भयो!"
+  },
+  "verify-code": {
+    "title": "मतदान पहुँचको लागि तपाईंको पहिचान पुष्टि गर्नुहोस्",
+    "instruction": "तपाईंको उपकरणमा पठाइएको कोड प्रविष्ट गर्नुहोस्:",
+    "errorInvalidCode": "अवैध प्रमाणिकरण कोड",
+    "errorEmptyCode": "कृपया प्रमाणिकरण कोड प्रविष्ट गर्नुहोस्",
+    "errorUnexpected": "अप्रत्याशित त्रुटि आएको छ",
+    "errorResendFailed": "कोड पुन: पठाउन असफल",
+    "labelCode": "प्रमाणिकरण कोड:",
+    "buttonSubmit": "पेश गर्नुहोस्",
+    "buttonVerifying": "प्रमाणित हुँदैछ...",
+    "buttonResend": "कोड पुन: पठाउनुहोस्",
+    "buttonResending": "पुन: पठाउँदै...",
+    "havingTrouble": "समस्या भैरहेको छ?",
+    "getHelp": "सहायता प्राप्त गर्नुहोस्",
+    "backToLogin": "लगइनमा फर्कनुहोस्"
+  },
+  "footer": {
+    "title": "इलेक्शनरनर",
+    "description": "सबै प्रकारका संस्थाहरूको लागि सुरक्षित र पारदर्शी अनलाइन मतदान प्लेटफर्म।",
+    "quickLinks": "छिटो पहुँच",
+    "home": "गृहपृष्ठ",
+    "aboutUs": "हाम्रो बारेमा",
+    "features": "विशेषताहरू",
+    "pricing": "मूल्य",
+    "support": "सहयोग",
+    "helpCenter": "सहायता केन्द्र",
+    "contactUs": "सम्पर्क गर्नुहोस्",
+    "privacyPolicy": "गोपनीयता नीति",
+    "termsOfService": "सेवा सर्तहरू",
+    "contact": "सम्पर्क",
+    "email": "इमेल: info@electionrunner.com",
+    "phone": "फोन: +1 (555) 123-4567",
+    "address": "ठेगाना: 123 Voting St, डेमोक्रेसी सिटी",
+    "copyright": "सबै अधिकार सुरक्षित।"
+  },
+  "navbar": {
+    "title": "अनलाइन मतदान प्रणाली",
+    "profile": "प्रोफाइल",
+    "settings": "सेटिङ्स",
+    "logout": "लगआउट"
+  },
+  "login-page": {
+    "loginToAccount": "तपाईंको खाता मा लगइन गर्नुहोस्",
+    "loginUsingSocial": "सामाजिक नेटवर्कहरू प्रयोग गरेर लगइन गर्नुहोस्",
+    "or": "वा",
+    "forgotPassword": "पासवर्ड बिर्सनुभयो",
+    "loginButton": "लगइन गर्नुहोस्",
+    "loggingIn": "लगइन हुँदै...",
+    "newHere": "नयाँ हुनुहुन्छ?",
+    "signUp": "साइन अप गर्नुहोस्",
+    "signUpMessage": "साइन अप गरेर नयाँ अवसरहरूको अन्वेषण गर्नुहोस्!"
+  },
+  "error": {
+    "loginFailed": "लगइन असफल भयो। कृपया तपाईंको प्रमाणपत्र जाँच गर्नुहोस्।",
+    "registrationFailed": "दर्ता असफल भयो। कृपया पुनः प्रयास गर्नुहोस्।"
+  },
+  "auth-buttons": {
+    "loginWithGoogle": "गूगलसँग लगइन गर्नुहोस्"
+  },
+  "errorauth": {
+    "authenticationRequired": "प्रमाणीकरण आवश्यक छ",
+    "invalidResponse": "सर्भरबाट अमान्य प्रतिक्रिया",
+    "unexpectedError": "अप्रत्याशित त्रुटि आयो",
+    "voteAlreadySubmitted": "प्रयोगकर्ताले यस निर्वाचनमा पहिले नै मतदान गरेका छन्",
+    "incorrectPassword": "गलत पासवर्ड",
+    "failedToSubmitVote": "मतदान पेश गर्न असफल",
+    "failedToGetReminders": "स्मरणपत्र प्राप्त गर्न असफल",
+    "failedToCancelReminder": "स्मरणपत्र रद्द गर्न असफल",
+    "failedToSetReminder": "स्मरणपत्र सेट गर्न असफल"
+  },
+  "success": {
+    "otpResent": "OTP पुनः पठाइयो",
+    "voteSubmitted": "मतदान सफलतापूर्वक पेश गरियो",
+    "reminderSet": "स्मरणपत्र सफलतापूर्वक सेट गरियो",
+    "reminderCancelled": "स्मरणपत्र सफलतापूर्वक रद्द गरियो"
+  },
+  "authentication": {
+    "loginRequired": "तपाईंले स्मरणपत्र सेट गर्नका लागि लगइन गर्नु आवश्यक छ"
+  },
+  "election": {
+    "electionNotFound": "निर्वाचन फेला परेन",
+    "electionResults": "निर्वाचन परिणाम सफलतापूर्वक प्राप्त गरियो"
+  },
+  "user": {
+    "alreadyVoted": "तपाईंले यस निर्वाचनमा पहिले नै मतदान गरिसक्नु भएको छ"
   }
-  
+}
