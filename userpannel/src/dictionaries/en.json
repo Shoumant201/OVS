@@ -1,295 +1,37 @@
 {
-  "forgot-password": {
-    "title": "Forgot Password",
-    "placeholderEmail": "Enter your email",
-    "buttonSending": "Sending...",
-    "buttonSendResetLink": "Send Reset Link",
-    "successMessage": "Reset link sent. Please check your inbox.",
-    "errorMessage": "Something went wrong"
-  },
-  "elections-page": {
-    "title": "Available Elections",
-    "subtitle": "Browse and participate in elections you're eligible for",
-    "searchPlaceholder": "Search elections...",
-    "filterButton": "All Statuses",
-    "filterAll": "All Statuses",
-    "filterScheduled": "Scheduled",
-    "filterOngoing": "Ongoing",
-    "filterFinished": "Finished",
-    "loading": "Loading elections...",
-    "noElections": "No elections found matching your criteria",
-    "voteNow": "Vote Now",
-    "viewDetails": "View Details",
-    "viewResults": "View Results",
-    "voters": "voters",
-    "questions": "questions"
-  },
-  "vote-page": {
-    "loadingElectionData": "Loading election data...",
-    "backToElections": "Back to Elections",
-    "backToElectionDetails": "Back to Election Details",
-    "errorTitle": "Error",
-    "errorElectionNotFound": "Election not found",
-    "errorNotStarted": "This election has not started yet",
-    "errorEnded": "This election has ended",
-    "errorGeneric": "Failed to load election data",
-    "returnToElections": "Return to Elections"
-  },
-  "results-page": {
-    "loadingElectionResults": "Loading election results...",
-    "backToElections": "Back to Elections",
-    "backToElectionDetails": "Back to Election Details",
-    "errorTitle": "Error",
-    "errorElectionNotFound": "Election not found",
-    "errorLiveResultsHidden": "Live results are hidden for this election.",
-    "errorResultsLoadFailed": "Failed to load election results",
-    "returnToElections": "Return to Elections",
-    "liveResultsMessage": "Live results are being displayed. These may change until the election ends.",
-    "electionEndedOn": "Election ended on",
-    "resultsNotAvailable": "Results Not Available",
-    "resultsNotAvailableMessage": "The results for this election are not available yet. Results will be published after the election ends."
-  },
-  "election-detail": {
-    "back-to-elections": "Back to Elections",
-    "loading-election-details": "Loading election details...",
-    "election-not-found": "Election not found",
-    "starts-in": "Starts in",
-    "ends-in": "Ends in",
-    "election-status": "Election Status",
-    "voters": "Eligible voters",
-    "ballot-questions": "Ballot questions",
-    "organizer": "Organizer",
-    "location": "Location",
-    "eligibility": "Eligibility",
-    "organizer-contact": "Organizer Contact",
-    "share-election": "Share Election",
-    "get-help": "Get Help",
-    "registration-deadline": "Registration Deadline",
-    "voting-opens": "Voting Opens",
-    "voting-closes": "Voting Closes",
-    "results-announced": "Results Announced",
-    "election-details": "Election Details"
-  },
-  "election-status": {
-    "scheduled": "Scheduled",
-    "ongoing": "Ongoing",
-    "finished": "Finished"
-  },
-  "progress-bar": {
-    "progress": "Progress"
-  },
-  "home": {
-    "welcome": "Welcome to the Online Voting System",
-    "description": "A secure and transparent platform for casting your vote",
-    "getStarted": "Get Started"
-  },
-  "vote": {
-    "title": "Cast Your Vote",
-    "selectCandidate": "Select a candidate",
-    "submit": "Submit Vote",
-    "success": "Your vote has been recorded",
-    "alreadyVoted": "You have already voted"
-  },
-  "auth": {
-    "email": "Email",
-    "password": "Password",
-    "login": "Login",
-    "register": "Register",
-    "name": "Full Name",
-    "confirmPassword": "Confirm Password"
-  },
-  "two-fa": {
-    "secureVotingAccess": "Secure Your Voting Access",
-    "chooseVerificationMethod": "Choose how you'd like to receive your one-time verification codes.",
-    "email": "Email",
-    "emailDescription": "Get codes delivered to your email.",
-    "no2FA": "No 2FA",
-    "no2FADescription": "Not recommended - your account may be less secure.",
-    "continue": "Continue"
-  },
-  "basic-info": {
-    "title": "Basic User Info",
-    "noImage": "No Image",
-    "uploading": "Uploading...",
-    "fullName": "Full Name",
-    "email": "Email",
-    "phone": "Phone Number",
-    "dob": "Date of Birth",
-    "gender": "Gender",
-    "selectGender": "Select Gender",
-    "male": "Male",
-    "female": "Female",
-    "otherGender": "Other",
-    "country": "Country",
-    "state": "State/Province/Region",
-    "city": "City",
-    "postalCode": "Postal Code",
-    "ethnicity": "Ethnicity",
-    "occupation": "Occupation",
-    "selectOccupation": "Select Occupation",
-    "student": "Student",
-    "employedFull": "Employed - Full Time",
-    "employedPart": "Employed - Part Time",
-    "selfEmployed": "Self-Employed",
-    "unemployed": "Unemployed",
-    "retired": "Retired",
-    "homemaker": "Homemaker",
-    "freelancer": "Freelancer",
-    "otherOccupation": "Other",
-    "education": "Education",
-    "selectEducation": "Select Education Level",
-    "noFormal": "No Formal Education",
-    "primary": "Primary School",
-    "secondary": "Secondary School",
-    "highSchool": "High School Diploma",
-    "associate": "Associate Degree",
-    "bachelor": "Bachelor's Degree",
-    "master": "Master's Degree",
-    "phd": "Doctorate (PhD)",
-    "otherEducation": "Other",
-    "continue": "Continue"
-  },
-  "reset-password": {
-    "title": "Reset Password",
-    "newPassword": "New Password",
-    "confirmNewPassword": "Confirm New Password",
-    "button": "Reset Password",
-    "resetting": "Resetting...",
-    "passwordMismatch": "Passwords do not match",
-    "success": "Password reset successful! Redirecting...",
-    "error": "Something went wrong"
-  },
-  "account-settings": {
-    "accountSettings": "Account Settings"
-  },
-  "tabs": {
-    "profileInformation": "Profile Information",
-    "security": "Security",
-    "preferences": "Preferences"
-  },
-  "profile-information": {
-    "title": "Profile Information",
-    "description": "Update your personal information and profile picture",
-    "fullName": "Full Name",
-    "email": "Email Address",
-    "phoneNumber": "Phone Number",
-    "dateOfBirth": "Date of Birth",
-    "gender": "Gender",
-    "country": "Country",
-    "state": "State",
-    "city": "City",
-    "postalCode": "Postal Code",
-    "ethnicity": "Ethnicity",
-    "occupation": "Occupation",
-    "educationLevel": "Education",
-    "changeProfilePicture": "Change Profile Picture"
-  },
-  "messages": {
-    "error": "Error",
-    "success": "Success",
-    "profileUpdated": "Profile updated successfully",
-    "profileUpdateFailed": "Failed to update profile",
-    "passwordUpdated": "Password updated successfully",
-    "passwordUpdateFailed": "Failed to update password",
-    "passwordMismatch": "New passwords do not match",
-    "passwordLength": "Password must be at least 8 characters long",
-    "2faEnabled": "Two-factor authentication enabled successfully",
-    "2faDisabled": "Two-factor authentication disabled successfully",
-    "2faError": "Failed to update two-factor authentication settings"
-  },
-  "verify-page": {
-    "verifyingEmail": "Verifying your email...",
-    "emailVerified": "✅ Email verified successfully!",
-    "redirectingLogin": "Redirecting to login...",
-    "verificationFailed": "❌ Verification failed!"
-  },
-  "verify-code": {
-    "title": "Confirm Your Identity for Voting Access",
-    "instruction": "Enter the code sent to your device:",
-    "errorInvalidCode": "Invalid verification code",
-    "errorEmptyCode": "Please enter the verification code",
-    "errorUnexpected": "An unexpected error occurred",
-    "errorResendFailed": "Failed to resend code",
-    "labelCode": "Verification Code:",
-    "buttonSubmit": "Submit",
-    "buttonVerifying": "Verifying...",
-    "buttonResend": "Resend Code",
-    "buttonResending": "Resending...",
-    "havingTrouble": "Having trouble?",
-    "getHelp": "Get Help",
-    "backToLogin": "Back to Login"
-  },
-  "footer": {
-    "title": "ElectionRunner",
-    "description": "Secure and transparent online voting platform for organizations of all sizes.",
-    "quickLinks": "Quick Links",
-    "home": "Home",
-    "aboutUs": "About Us",
-    "features": "Features",
-    "pricing": "Pricing",
-    "support": "Support",
-    "helpCenter": "Help Center",
-    "contactUs": "Contact Us",
-    "privacyPolicy": "Privacy Policy",
-    "termsOfService": "Terms of Service",
-    "contact": "Contact",
-    "email": "Email: info@electionrunner.com",
-    "phone": "Phone: +1 (555) 123-4567",
-    "address": "Address: 123 Voting St, Democracy City",
-    "copyright": "All rights reserved."
-  },
-  "navbar": {
-    "title": "Online Voting System",
-    "profile": "Profile",
-    "settings": "Settings",
-    "logout": "Logout"
-  },
-  "login-page": {
-    "loginToAccount": "Login to your account",
-    "loginUsingSocial": "Login using social networks",
-    "or": "or",
-    "forgotPassword": "Forgot password",
-    "loginButton": "Login",
-    "loggingIn": "Logging in...",
-    "newHere": "New here?",
-    "signUp": "Sign up",
-    "signUpMessage": "Sign up and explore new opportunities!"
-  },
-  "error": {
-    "loginFailed": "Login failed. Please check your credentials.",
-    "registrationFailed": "Registration failed. Please try again."
-  },
-  "auth-buttons": {
-    "loginWithGoogle": "Login with Google"
-  },
-  
-  "errorauth": {
-    "authenticationRequired": "Authentication required",
-    "invalidResponse": "Invalid response from server",
-    "unexpectedError": "An unexpected error occurred",
-    "voteAlreadySubmitted": "User has already voted in this election",
-    "incorrectPassword": "Incorrect password",
-    "failedToSubmitVote": "Failed to submit vote",
-    "failedToGetReminders": "Failed to get reminders",
-    "failedToCancelReminder": "Failed to cancel reminder",
-    "failedToSetReminder": "Failed to set reminder"
-  },
-  "success": {
-    "otpResent": "OTP resent successfully",
-    "voteSubmitted": "Vote submitted successfully",
-    "reminderSet": "Reminder set successfully",
-    "reminderCancelled": "Reminder cancelled successfully"
-  },
-  "authentication": {
-    "loginRequired": "You must be logged in to set a reminder"
-  },
-  "election": {
-    "electionNotFound": "Election not found",
-    "electionResults": "Election results fetched successfully"
-  },
-  "user": {
-    "alreadyVoted": "You have already voted in this election"
+    "common": {
+      "title": "Online Voting System",
+      "language": "Language",
+      "english": "English",
+      "nepali": "Nepali"
+    },
+    "nav": {
+      "home": "Home",
+      "vote": "Vote Now",
+      "results": "Results",
+      "login": "Login",
+      "register": "Register",
+      "logout": "Logout"
+    },
+    "home": {
+      "welcome": "Welcome to the Online Voting System",
+      "description": "A secure and transparent platform for casting your vote",
+      "getStarted": "Get Started"
+    },
+    "vote": {
+      "title": "Cast Your Vote",
+      "selectCandidate": "Select a candidate",
+      "submit": "Submit Vote",
+      "success": "Your vote has been recorded",
+      "alreadyVoted": "You have already voted"
+    },
+    "auth": {
+      "email": "Email",
+      "password": "Password",
+      "login": "Login",
+      "register": "Register",
+      "name": "Full Name",
+      "confirmPassword": "Confirm Password"
+    }
   }
-
-
-}
+  
