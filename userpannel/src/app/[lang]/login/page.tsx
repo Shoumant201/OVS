@@ -1,10 +1,17 @@
 import LoginPage from '@/pages/login/Page'
 import React from 'react'
+import { type Locale, getDictionary } from "@/lib/dictionary"
 
-const Login = () => {
+const Login = async ({
+  params: {lang},
+}: {
+  params: {lang: Locale}
+}) => {
+
+  const dictionary = await getDictionary(lang)
   return (
     
-      <LoginPage/>
+      <LoginPage dictionary={dictionary} locale={lang}/>
     
   )
 }

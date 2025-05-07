@@ -27,7 +27,7 @@ const sendEmail = async (to, subject, html) => {
 
 // 1. Verification Email
 export const sendVerificationEmail = async (email, token) => {
-  const link = `http://localhost:3000/verify/${token}`;
+  const link = `http://localhost:3000/${lang}/verify/${token}`;
   const html = `
     <h2>Email Verification</h2>
     <p>Hello,</p>
@@ -41,7 +41,7 @@ export const sendVerificationEmail = async (email, token) => {
 
 // 2. Forgot Password Email
 export const sendForgotPasswordEmail = async (email, token) => {
-  const link = `http://localhost:3000/reset-password/${token}`;
+  const link = `http://localhost:3000/${lang}/reset-password/${token}`;
   const html = `
     <h2>Password Reset Request</h2>
     <p>Hello,</p>

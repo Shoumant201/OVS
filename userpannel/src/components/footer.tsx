@@ -1,7 +1,7 @@
 'use client'
 import React from 'react'
 
-const footer = () => {
+const Footer = () => {
   return (
     <footer className="bg-gray-800 text-white py-12 mt-12">
         <div className="container mx-auto px-4">
@@ -79,4 +79,4 @@ const footer = () => {
   )
 }
 
-export default footer
+export default Footer

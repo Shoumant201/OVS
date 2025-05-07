@@ -9,8 +9,18 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Eye, EyeOff } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import ENDPOINTS from "@/services/Endpoints"
+import { type Locale } from '@/lib/dictionary'
+import { useLocalizedNavigation } from "@/lib/use-localized-navigation"
+import { useLanguage } from "@/lib/language-provider"
+import { LocalizedLink } from "@/components/LocalizedLink"
 
-const LoginPage = () => {
+const LoginPage = ({
+  dictionary,
+  locale,
+}: {
+  dictionary: any
+  locale: Locale
+}) => {
   const [showPassword, setShowPassword] = useState(false)
   const [isLogin, setIsLogin] = useState(true)
   const [loading, setLoading] = useState(false)
@@ -60,11 +70,11 @@ const LoginPage = () => {
       if (response.data.require2FA) {
         // Store temporary token and redirect to OTP verification page
         localStorage.setItem("tempToken", response.data.tempToken)
-        router.push("/verify-code")
+        router.push(`/${locale}/verify-code`)
       } else {
         // Store token and redirect to dashboard
         Cookies.set("token", response.data.token, { expires: 30 })
-        router.push("/")
+        router.push(`/${locale}/home`)
       }
     } catch (error: any) {
       console.error("Login error:", error)
@@ -239,7 +249,7 @@ const LoginPage = () => {
                       </button>
                     </div>
                     <div className="flex justify-end -mt-2">
-                      <a href="/forgot-password" className="text-sm text-blue-500 hover:underline">
+                      <a href={`/${locale}/forgot-password`} className="text-sm text-blue-500 hover:underline">
                         Forgot password?
                       </a>
                     </div>

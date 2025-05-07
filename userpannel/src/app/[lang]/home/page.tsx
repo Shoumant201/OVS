@@ -10,7 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { DateTime } from "luxon"
 import axiosInstance from "@/services/axiosInstance"
 import ENDPOINTS from "@/services/Endpoints"
-import { type Locale } from '@/lib/dictionary'
+import type { Locale } from "@/lib/dictionary"
 
 interface Election {
   id: number
@@ -42,13 +42,20 @@ export default function ElectionsPage({
   const [elections, setElections] = useState<Election[]>([])
   const [loading, setLoading] = useState(true)
 
+  // Store the current locale in sessionStorage for recovery if needed
+  useEffect(() => {
+    if (locale) {
+      sessionStorage.setItem("currentLocale", locale)
+    }
+  }, [locale])
+
   useEffect(() => {
     // Simulate fetching elections from API
     const fetchElections = async () => {
       setLoading(true)
       try {
         const response = await axiosInstance.get(ENDPOINTS.ELECTION.getUserElections)
-        console.log(response.data);
+        console.log(response.data)
 
         setElections(response.data)
       } catch (error) {
@@ -76,9 +83,15 @@ export default function ElectionsPage({
     return matchesSearch && matchesStatus
   })
 
-
   const handleElectionClick = (id: number) => {
-    router.push(`/${locale}/home/${id}`)
+    // Get the current locale, with fallback to sessionStorage or default
+    const currentLocale = locale || sessionStorage.getItem("currentLocale") || "en"
+
+    // Log the navigation for debugging
+    console.log(`Navigating to election ${id} with locale ${currentLocale}`)
+
+    // Navigate with the proper locale prefix
+    router.push(`/${currentLocale}/home/${id}`)
   }
 
   const getStatusColor = (status: string) => {
@@ -99,8 +112,8 @@ export default function ElectionsPage({
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-2">Available Elections</h2>
-          <p className="text-gray-600">Browse and participate in elections you're eligible for</p>
+          <h2 className="text-3xl font-bold mb-2">{dictionary["elections-page"].title}</h2>
+          <p className="text-gray-600">{dictionary["elections-page"].subtitle}</p>
         </div>
 
         {/* Search and Filters */}
@@ -108,7 +121,7 @@ export default function ElectionsPage({
           <div className="relative flex-grow">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <Input
-              placeholder="Search elections..."
+              placeholder={dictionary["elections-page"].searchPlaceholder}
               className="pl-10"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -118,25 +131,25 @@ export default function ElectionsPage({
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="flex items-center gap-2">
                 <Filter className="h-4 w-4" />
-                {statusFilter || "All Statuses"}
+                {statusFilter || dictionary["elections-page"].filterButton}
                 <ChevronDown className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem onClick={() => setStatusFilter(null)}>All Statuses</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter("scheduled")}>Scheduled</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter("ongoing")}>Ongoing</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter("finished")}>Finished</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setStatusFilter(null)}>{dictionary["elections-page"].filterAll}</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setStatusFilter(dictionary["elections-page"].filterScheduled)}>{dictionary["elections-page"].filterScheduled}</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setStatusFilter(dictionary["elections-page"].filterOngoing)}>{dictionary["elections-page"].filterOngoing}</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setStatusFilter(dictionary["elections-page"].filterFinished)}>{dictionary["elections-page"].filterFinished}</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
 
         {/* Elections Grid */}
         {loading ? (
-          <div className="text-center py-12">Loading elections...</div>
+          <div className="text-center py-12">{dictionary["elections-page"].loading}</div>
         ) : filteredElections.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-lg border">
-            <p className="text-gray-500">No elections found matching your criteria</p>
+            <p className="text-gray-500">{dictionary["elections-page"].noElections}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -148,7 +161,6 @@ export default function ElectionsPage({
               >
                 <div className="p-6">
                   <div className="flex items-start gap-4">
-                    
                     <div className="flex-grow">
                       <div className="flex justify-between items-start">
                         <h3 className="text-xl font-semibold">{election.title}</h3>
@@ -165,11 +177,11 @@ export default function ElectionsPage({
                         </div>
                         <div className="flex items-center">
                           <Users className="h-4 w-4 mr-1" />
-                          <span>{election.voters} voters</span>
+                          <span>{election.voters} {dictionary["elections-page"].voters}</span>
                         </div>
                         <div className="flex items-center">
                           <CheckSquare className="h-4 w-4 mr-1" />
-                          <span>{election.ballot_questions} questions</span>
+                          <span>{election.ballot_questions} {dictionary["elections-page"].questions}</span>
                         </div>
                       </div>
                     </div>
@@ -179,10 +191,10 @@ export default function ElectionsPage({
                   <div className="flex justify-end">
                     <Button className="bg-[#26C6B0] hover:bg-[#269bc6] ">
                       {election.status.toLowerCase() === "ongoing"
-                        ? "Vote Now"
+                        ? dictionary["elections-page"].voteNow
                         : election.status.toLowerCase() === "scheduled"
-                          ? "View Details"
-                          : "View Results"}
+                          ? dictionary["elections-page"].viewDetails
+                          : dictionary["elections-page"].viewResults}
                     </Button>
                   </div>
                 </div>

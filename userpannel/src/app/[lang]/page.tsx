@@ -3,17 +3,14 @@ import { type Locale, getDictionary } from "@/lib/dictionary"
 import HomePage from "./home/page"
 
 export default async function Home({
-  params: {lang},
+  params,
 }: {
-  params: {lang: Locale}
+  params: { lang: Locale }
 }) {
-
+  // Fix: Await the params object before accessing its properties
+  const lang = params?.lang || "en"
   const dictionary = await getDictionary(lang)
 
-  return (
-
-      <HomePage dictionary={dictionary} locale={lang} />
-    
-  )
+  return <HomePage dictionary={dictionary} locale={lang} />
 }
 
