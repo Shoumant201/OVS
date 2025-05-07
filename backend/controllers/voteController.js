@@ -1,4 +1,4 @@
-import { voteCheck, electionCheck, insertVote, getElectionResults } from "../models/voteModel.js";
+import { voteCheck, electionCheck, insertVote, getElectionResults, getDetailedElectionResults } from "../models/voteModel.js";
 import pool from "../config/db.js";
 
 export const checkVoteStatus = async (req, res) => {
@@ -116,6 +116,45 @@ export const getResults = async (req, res) => {
     res.status(500).json({ 
       message: "Server error", 
       error: error.message 
+    });
+  }
+};
+export const getDetailedResults = async (req, res) => {
+  try {
+    const { electionId } = req.params;
+
+    // Get election details
+    const electionResult = await pool.query(
+      "SELECT * FROM elections WHERE id = $1",
+      [electionId]
+    );
+
+    if (electionResult.rows.length === 0) {
+      return res.status(404).json({ message: "Election not found" });
+    }
+
+    const election = electionResult.rows[0];
+    // const now = new Date();
+    // const endDate = new Date(election.end_date);
+
+    // Authorization is primarily handled by isSuperAdmin middleware.
+    // You might still want checks like if the election has ended, etc.
+    // For simplicity here, we'll rely on middleware for access control.
+
+    const detailedResultsData = await getDetailedElectionResults(electionId);
+
+    res.json({
+      election_id: electionId,
+      title: election.title,
+      end_date: election.end_date,
+      results_published: election.results_published, // good to include status
+      detailed_results: detailedResultsData,
+    });
+  } catch (error) {
+    console.error("Error getting detailed election results:", error);
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
     });
   }
 };

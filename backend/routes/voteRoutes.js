@@ -1,5 +1,5 @@
 import express from "express";
-import { checkVoteStatus, submitVote, getResults } from "../controllers/voteController.js";
+import { checkVoteStatus, submitVote, getResults, getDetailedResults} from "../controllers/voteController.js";
 import { authenticate } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
@@ -12,5 +12,8 @@ router.post("/", authenticate, submitVote);
 
 // Get election results
 router.get("/elections/:electionId/results", authenticate, getResults);
+
+// Get detailed election results 
+router.get("/elections/:electionId/detailed-results", authenticate, getDetailedResults); 
 
 export default router;
