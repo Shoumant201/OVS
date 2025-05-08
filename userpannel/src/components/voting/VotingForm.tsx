@@ -20,6 +20,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { useLocalizedNavigation } from "@/lib/use-localized-navigation"
+import { useLanguage } from "@/lib/language-provider"
+import { LocalizedLink } from "@/components/LocalizedLink"
 
 interface Question {
   id: number
@@ -49,6 +52,9 @@ interface VotingFormProps {
   startDate: string
 }
 
+
+
+
 export function VotingForm({ electionId, questions, candidates, electionStatus, startDate }: VotingFormProps) {
   const router = useRouter()
   const [selections, setSelections] = useState<Record<number, number[]>>({})
@@ -61,6 +67,15 @@ export function VotingForm({ electionId, questions, candidates, electionStatus, 
   const [settingReminder, setSettingReminder] = useState(false)
   const [reminderSuccess, setReminderSuccess] = useState<string | null>(null)
   const [reminderError, setReminderError] = useState<string | null>(null)
+
+  const { locale } = useLanguage()
+  const { navigate } = useLocalizedNavigation()
+
+  // Example of programmatic navigation
+  const handleButtonClick = () => {
+    navigate(`/home/${electionId}/results`)
+  }
+
 
   // Flag to use mock implementation instead of real API
   const [useMockApi, setUseMockApi] = useState(false) // Set to false to use real API by default
@@ -500,7 +515,7 @@ export function VotingForm({ electionId, questions, candidates, electionStatus, 
           </Button>
         ) : (
           <Button
-            onClick={() => router.push(`/home/${electionId}/results`)}
+            onClick={handleButtonClick}
             className="bg-gray-600 hover:bg-gray-700 text-white"
             size="lg"
           >

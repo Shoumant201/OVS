@@ -4,6 +4,9 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
 import { verifyOTP, resendOTP } from "@/services/api/Authentication"
+import { useLocalizedNavigation } from "@/lib/use-localized-navigation"
+import { useLanguage } from "@/lib/language-provider"
+import { LocalizedLink } from "@/components/LocalizedLink"
 
 export default function VerifyCodePage() {
   const [code, setCode] = useState("")
@@ -11,6 +14,14 @@ export default function VerifyCodePage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
+
+    const { locale } = useLanguage()
+    const { navigate } = useLocalizedNavigation()
+  
+    // Example of programmatic navigation
+    const handleButtonClick = () => {
+      navigate(`/`)
+    }
 
   useEffect(() => {
     // Check if temp token exists
@@ -34,7 +45,7 @@ export default function VerifyCodePage() {
 
       if (result.success) {
         // Redirect to dashboard
-        router.replace("/")
+        navigate(`/`)
       } else {
         setError(result.error || "Invalid verification code")
       }

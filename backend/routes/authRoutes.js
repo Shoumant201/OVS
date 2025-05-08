@@ -10,6 +10,29 @@ import { updateUserProfile } from '../models/userModel.js';
 const router = express.Router();
 
 router.post('/register', register);
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: User login
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *       401:
+ *         description: Invalid credentials
+ */
 router.post('/login', login);
 router.get('/verify/:token', verifyEmail);
 router.post('/forgot-password', forgotPassword);
