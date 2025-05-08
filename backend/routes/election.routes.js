@@ -22,6 +22,13 @@ import {
     updateResultsVisibility,
     publishElectionResults,
     launchElection,
+    getElectionResultsController,
+    getCandidateDemographicsController,
+    getVoterTurnoutController,
+    getUserVotesController,
+    recordVoteController,
+    exportElectionResultsController,
+    exportDemographicDataController,
 } from "../controllers/election.controller.js";
 import { authenticate } from "../middleware/authMiddleware.js"; // Fixed import
 import { isAdmin, hasRole } from "../middleware/admin.middleware.js";
@@ -430,5 +437,167 @@ router.put(
  *         description: Election launched
  */
   router.post("/:id/launch",authenticate, launchElection)
+
+  /**
+ * @swagger
+ * /api/elections/{id}/results:
+ *   get:
+ *     summary: Get election results with vote counts
+ *     tags: [Election Results]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Election results retrieved successfully
+ *       404:
+ *         description: Election not found
+ */
+router.get("/:id/results", authenticate, getElectionResultsController)
+
+/**
+ * @swagger
+ * /api/elections/{id}/turnout:
+ *   get:
+ *     summary: Get voter turnout data
+ *     tags: [Election Results]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Voter turnout data retrieved successfully
+ *       404:
+ *         description: Election not found
+ */
+router.get("/:id/turnout", authenticate, getVoterTurnoutController)
+
+/**
+ * @swagger
+ * /api/elections/{electionId}/questions/{questionId}/candidates/{candidateId}/demographics:
+ *   get:
+ *     summary: Get demographic data for a specific candidate
+ *     tags: [Election Results]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: electionId
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - name: questionId
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - name: candidateId
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Demographic data retrieved successfully
+ *       404:
+ *         description: Resource not found
+ */
+router.get(
+  "/:electionId/questions/:questionId/candidates/:candidateId/demographics",
+  authenticate,
+  getCandidateDemographicsController,
+)
+
+/**
+ * @swagger
+ * /api/elections/{id}/export:
+ *   get:
+ *     summary: Export election results
+ *     tags: [Election Results]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - name: format
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [csv, json]
+ *           default: csv
+ *     responses:
+ *       200:
+ *         description: Election results exported successfully
+ *       404:
+ *         description: Election not found
+ */
+router.get("/:id/export", authenticate, exportElectionResultsController)
+
+/**
+ * @swagger
+ * /api/elections/{electionId}/demographics/export:
+ *   get:
+ *     summary: Export demographic data
+ *     tags: [Election Results]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: electionId
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - name: format
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [csv, json]
+ *           default: csv
+ *     responses:
+ *       200:
+ *         description: Demographic data exported successfully
+ *       404:
+ *         description: Election not found
+ */
+router.get("/:electionId/demographics/export", authenticate, exportDemographicDataController)
+
+/**
+ * @swagger
+ * /api/elections/{electionId}/votes:
+ *   get:
+ *     summary: Get votes by a specific user
+ *     tags: [Voting]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: electionId
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: User votes retrieved successfully
+ *       404:
+ *         description: Election not found
+ */
+router.get("/:electionId/votes", authenticate, getUserVotesController)
+
+
 
 export default router;
