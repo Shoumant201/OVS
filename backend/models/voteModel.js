@@ -89,3 +89,63 @@ export const getElectionResults = async (electionId) => {
     throw error;
   }
 };
+
+export const getDetailedElectionResults = async (electionId) => {
+  try {
+    // Get questions for this election
+    const questionsResult = await pool.query(
+      "SELECT id, title FROM questions WHERE election_id = $1 ORDER BY id",
+      [electionId]
+    );
+    const questions = questionsResult.rows;
+    const detailedResults = [];
+
+    for (const question of questions) {
+      // Get candidates for this question
+      const candidatesResult = await pool.query(
+        "SELECT id, candidate_name FROM candidates WHERE question_id = $1 ORDER BY id",
+        [question.id]
+      );
+      const candidatesWithVoters = [];
+
+      for (const candidate of candidatesResult.rows) {
+        // Get users who voted for this candidate on this question
+        const votersResult = await pool.query(
+          `SELECT
+             v.user_id,
+             u.email AS user_email,
+             COALESCE(up.full_name, u.name) AS user_name,
+             v.created_at AS voted_at
+           FROM votes v
+           JOIN users u ON v.user_id = u.id
+           LEFT JOIN user_profiles up ON u.id = up.user_id
+           WHERE v.election_id = $1 AND v.question_id = $2 AND v.candidate_id = $3
+           ORDER BY v.created_at DESC`,
+          [electionId, question.id, candidate.id]
+        );
+
+        candidatesWithVoters.push({
+          id: candidate.id,
+          name: candidate.candidate_name,
+          vote_count: votersResult.rows.length,
+          voters: votersResult.rows.map(voter => ({
+            user_id: voter.user_id,
+            name: voter.user_name,
+            email: voter.user_email,
+            voted_at: voter.voted_at
+          }))
+        });
+      }
+
+      detailedResults.push({
+        question_id: question.id,
+        title: question.title,
+        candidates: candidatesWithVoters,
+      });
+    }
+    return detailedResults;
+  } catch (error) {
+    console.error("Error getting detailed election results:", error);
+    throw error;
+  }
+};
