@@ -1,18 +1,24 @@
 "use client"
 
+import { Badge } from "@/components/ui/badge"
+
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, BarChart3, PieChart, Users } from "lucide-react"
+import { ArrowLeft, BarChart3, PieChart, Users, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { getElectionById } from "@/services/api/Authentication"
-import { getElectionResults } from "@/services/api/Authentication"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Skeleton } from "@/components/ui/skeleton"
 import { DateTime } from "luxon"
+import { useLanguage } from "@/lib/language-provider"
 import { ResultsSummary } from "./results-summary"
 import { DemographicCharts } from "./demographics-chart"
 import { VoterTurnout } from "./voter-turnout"
-import { useLanguage } from "@/lib/language-provider"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import axiosInstance from "@/services/axiosInstance"
 import type { Locale } from "@/lib/dictionary"
+import type { ElectionResult } from "../../../types/election-types"
 
 interface Election {
   id: number
@@ -33,29 +39,13 @@ interface Election {
   results_published: boolean
 }
 
-interface ElectionResult {
-  election_id: number | string
-  title: string
-  end_date: string
-  results: {
-    question_id: number
-    title: string
-    candidates: {
-      id: number
-      name: string
-      votes: number
-      photo?: string
-    }[]
-  }[]
-}
-
-interface ResultsPageProps {
+interface ElectionResultsPageProps {
   dictionary: any
   locale: Locale
   id: string
 }
 
-export default function ResultsPage({ dictionary, locale, id }: ResultsPageProps) {
+export default function ElectionResultsPage({ dictionary, locale, id }: ElectionResultsPageProps) {
   const router = useRouter()
   const { locale: contextLocale } = useLanguage()
   const [election, setElection] = useState<Election | null>(null)
@@ -73,7 +63,9 @@ export default function ResultsPage({ dictionary, locale, id }: ResultsPageProps
         setLoading(true)
 
         // Fetch election details
-        const electionData = (await getElectionById(id)) as Election
+        const electionResponse = await axiosInstance.get(`/elections/${id}`)
+        const electionData = electionResponse.data
+
         if (!electionData) {
           setError("Election not found")
           return
@@ -84,16 +76,15 @@ export default function ResultsPage({ dictionary, locale, id }: ResultsPageProps
         const now = new Date()
         const endDate = new Date(electionData.end_date)
 
-        if (now < endDate) {
-          if (electionData.hide_result) {
-            setError("Live results are hidden for this election.")
-            return
-          }
+        if (now < endDate && electionData.hide_result) {
+          setError("Live results are hidden for this election.")
+          setLoading(false)
+          return
         }
 
         // Fetch election results
-        const resultsData = await getElectionResults(id)
-        setResults(resultsData)
+        const resultsResponse = await axiosInstance.get(`/elections/${id}/results`)
+        setResults(resultsResponse.data)
       } catch (err) {
         console.error("Error fetching data:", err)
         setError("Failed to load election results")
@@ -106,99 +97,189 @@ export default function ResultsPage({ dictionary, locale, id }: ResultsPageProps
   }, [id])
 
   const handleBackNavigation = () => {
-    router.push(`/${currentLocale}/home/${id}`)
+    router.push(`/${currentLocale}/elections/${id}`)
+  }
+
+  const handleExport = async (format: string) => {
+    try {
+      window.open(`${process.env.NEXT_PUBLIC_API_URL}/elections/${id}/export?format=${format}`, "_blank")
+    } catch (error) {
+      console.error("Error exporting results:", error)
+    }
+  }
+
+  const handleExportDemographics = async (format: string) => {
+    try {
+      window.open(`${process.env.NEXT_PUBLIC_API_URL}/elections/${id}/demographics/export?format=${format}`, "_blank")
+    } catch (error) {
+      console.error("Error exporting demographics:", error)
+    }
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center dark:bg-[#121212]">
-        <p>Loading election results...</p>
+      <div className="container mx-auto p-6">
+        <Button variant="ghost" className="mb-6" onClick={handleBackNavigation}>
+          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Election Details
+        </Button>
+
+        <Card className="mb-6">
+          <CardHeader>
+            <Skeleton className="h-8 w-3/4 mb-2" />
+            <Skeleton className="h-4 w-1/2" />
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-4 w-full mb-2" />
+            <Skeleton className="h-4 w-full mb-2" />
+            <Skeleton className="h-4 w-3/4" />
+          </CardContent>
+        </Card>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-1/2 mb-2" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-[300px] w-full rounded-md" />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-1/2 mb-2" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-[300px] w-full rounded-md" />
+            </CardContent>
+          </Card>
+        </div>
       </div>
     )
   }
 
   if (error || !election) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6 dark:bg-[#121212]">
-        <div className="max-w-4xl mx-auto">
-          <Button variant="ghost" className="mb-6" onClick={() => router.push(`/${currentLocale}/home`)}>
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Elections
-          </Button>
+      <div className="container mx-auto p-6">
+        <Button variant="ghost" className="mb-6" onClick={() => router.push(`/${currentLocale}/elections`)}>
+          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Elections
+        </Button>
 
-          <div className="bg-red-50 border border-red-200 rounded-md p-6 text-center dark:bg-red-900 dark:border-red-800">
-            <h2 className="text-xl font-semibold text-red-800 mb-2 dark:text-red-100">Error</h2>
-            <p className="text-red-700 dark:text-red-200">{error || "Election not found"}</p>
-            <Button className="mt-4" onClick={() => router.push(`/${currentLocale}/home`)}>
-              Return to Elections
-            </Button>
-          </div>
-        </div>
+        <Alert variant="destructive" className="mb-6">
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{error || "Election not found"}</AlertDescription>
+        </Alert>
+
+        <Button onClick={() => router.push(`/${currentLocale}/elections`)}>Return to Elections</Button>
       </div>
     )
   }
 
+  const isLiveResults = new Date() < new Date(election.end_date) && !election.hide_result
+
   return (
-    <div className="min-h-screen bg-gray-50 p-6 dark:bg-[#121212]">
-      <div className="max-w-6xl mx-auto">
-        <Button variant="ghost" className="mb-6" onClick={handleBackNavigation}>
+    <div className="container mx-auto p-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+        <Button variant="ghost" onClick={handleBackNavigation} className="self-start">
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Election Details
         </Button>
 
-        <div className="bg-white rounded-lg border p-6 mb-6 dark:bg-black dark:border-gray-800">
-          {new Date() < new Date(election.end_date) && !election.hide_result && (
-            <div className="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded mb-4 text-center dark:bg-blue-900 dark:border-blue-800 dark:text-blue-100">
-              Live results are being displayed. These may change until the election ends.
-            </div>
-          )}
-          <h1 className="text-2xl font-bold mb-2">{election.title} - Results</h1>
-          <p className="text-gray-600 mb-4 dark:text-gray-400">
-            Election ended on {DateTime.fromISO(election.end_date).toFormat("LLL dd, yyyy, h:mm a")}
-          </p>
+        <div className="flex gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="flex items-center gap-2">
+                <Download className="h-4 w-4" />
+                Export Results
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => handleExport("csv")}>Export as CSV</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExport("json")}>Export as JSON</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="flex items-center gap-2">
+                <Download className="h-4 w-4" />
+                Export Demographics
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => handleExportDemographics("csv")}>Export as CSV</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExportDemographics("json")}>Export as JSON</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-
-        {results ? (
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid grid-cols-3 w-full max-w-md mx-auto mb-6">
-              <TabsTrigger value="summary" className="flex items-center gap-2">
-                <PieChart className="h-4 w-4" />
-                <span>Summary</span>
-              </TabsTrigger>
-              <TabsTrigger value="demographics" className="flex items-center gap-2">
-                <BarChart3 className="h-4 w-4" />
-                <span>Demographics</span>
-              </TabsTrigger>
-              <TabsTrigger value="turnout" className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                <span>Turnout</span>
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="summary" className="space-y-6">
-              <ResultsSummary results={results.results} />
-            </TabsContent>
-
-            <TabsContent value="demographics" className="space-y-6">
-              <DemographicCharts results={results.results} />
-            </TabsContent>
-
-            <TabsContent value="turnout" className="space-y-6">
-              <VoterTurnout
-                totalVoters={election.voters}
-                actualVoters={
-                  results.results.length > 0 ? results.results[0].candidates.reduce((sum, c) => sum + c.votes, 0) : 0
-                }
-              />
-            </TabsContent>
-          </Tabs>
-        ) : (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-md p-6 text-center dark:bg-yellow-900 dark:border-yellow-800">
-            <h2 className="text-xl font-semibold text-yellow-800 mb-2 dark:text-yellow-100">Results Not Available</h2>
-            <p className="text-yellow-700 dark:text-yellow-200">
-              The results for this election are not available yet. Results will be published after the election ends.
-            </p>
-          </div>
-        )}
       </div>
+
+      <Card className="mb-6">
+        <CardHeader>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+            <div>
+              <CardTitle className="text-2xl">{election.title} - Results</CardTitle>
+              <CardDescription>
+                {election.status === "finished"
+                  ? `Election ended on ${DateTime.fromISO(election.end_date).toFormat("LLL dd, yyyy, h:mm a")}`
+                  : `Election ends on ${DateTime.fromISO(election.end_date).toFormat("LLL dd, yyyy, h:mm a")}`}
+              </CardDescription>
+            </div>
+            {election.status === "ongoing" && (
+              <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">Live Results</Badge>
+            )}
+          </div>
+        </CardHeader>
+        {isLiveResults && (
+          <CardContent>
+            <Alert className="bg-blue-50 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
+              <AlertTitle>Live Results</AlertTitle>
+              <AlertDescription>These are live results and may change until the election ends.</AlertDescription>
+            </Alert>
+          </CardContent>
+        )}
+      </Card>
+
+      {results ? (
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid grid-cols-3 w-full max-w-md mx-auto mb-6">
+            <TabsTrigger value="summary" className="flex items-center gap-2">
+              <PieChart className="h-4 w-4" />
+              <span>Summary</span>
+            </TabsTrigger>
+            <TabsTrigger value="demographics" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              <span>Demographics</span>
+            </TabsTrigger>
+            <TabsTrigger value="turnout" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              <span>Turnout</span>
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="summary" className="space-y-6">
+            <ResultsSummary results={results.results} />
+          </TabsContent>
+
+          <TabsContent value="demographics" className="space-y-6">
+            <DemographicCharts results={results.results} electionId={id} />
+          </TabsContent>
+
+          <TabsContent value="turnout" className="space-y-6">
+            <VoterTurnout electionId={id} />
+          </TabsContent>
+        </Tabs>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>Results Not Available</CardTitle>
+            <CardDescription>The results for this election are not available yet.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-yellow-700 dark:text-yellow-200">
+              Results will be published after the election ends or when the administrator makes them available.
+            </p>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }

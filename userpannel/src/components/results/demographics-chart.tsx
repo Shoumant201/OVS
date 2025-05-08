@@ -1,10 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   BarChart,
   Bar,
@@ -18,44 +20,13 @@ import {
   Cell,
   ResponsiveContainer,
 } from "recharts"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-
-interface DemographicData {
-  age: {
-    "18-24": number
-    "25-34": number
-    "35-44": number
-    "45-54": number
-    "55-64": number
-    "65+": number
-  }
-  gender: {
-    male: number
-    female: number
-    other: number
-    prefer_not_to_say: number
-  }
-  education: {
-    high_school: number
-    bachelors: number
-    masters: number
-    phd: number
-    other: number
-  }
-  location: {
-    [country: string]: number
-  }
-  occupation: {
-    [field: string]: number
-  }
-}
+import axiosInstance from "@/services/axiosInstance"
 
 interface CandidateVotes {
   id: number
   name: string
   votes: number
   photo?: string
-  demographics?: DemographicData
 }
 
 interface QuestionResult {
@@ -64,16 +35,28 @@ interface QuestionResult {
   candidates: CandidateVotes[]
 }
 
+interface DemographicData {
+  age: Record<string, number>
+  gender: Record<string, number>
+  education: Record<string, number>
+  location: Record<string, number>
+  occupation: Record<string, number>
+}
+
 interface DemographicChartsProps {
   results: QuestionResult[]
+  electionId: string | number
 }
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8", "#82ca9d", "#ffc658", "#8dd1e1"]
 
-export function DemographicCharts({ results }: DemographicChartsProps) {
+export function DemographicCharts({ results, electionId }: DemographicChartsProps) {
   const [selectedQuestion, setSelectedQuestion] = useState<string>(results[0]?.question_id.toString() || "")
   const [selectedCandidate, setSelectedCandidate] = useState<string>("")
   const [demographicType, setDemographicType] = useState<string>("age")
+  const [demographicData, setDemographicData] = useState<DemographicData | null>(null)
+  const [loading, setLoading] = useState<boolean>(false)
+  const [error, setError] = useState<string | null>(null)
 
   // Find the current question and candidate
   const currentQuestion = results.find((q) => q.question_id.toString() === selectedQuestion)
@@ -90,74 +73,54 @@ export function DemographicCharts({ results }: DemographicChartsProps) {
     }
   }
 
-  // Mock demographic data for demonstration
-  // In a real app, this would come from your API
-  const getMockDemographicData = (candidateId: number): DemographicData => {
-    // Generate random but somewhat realistic data
-    return {
-      age: {
-        "18-24": Math.floor(Math.random() * 100) + 20,
-        "25-34": Math.floor(Math.random() * 150) + 50,
-        "35-44": Math.floor(Math.random() * 120) + 40,
-        "45-54": Math.floor(Math.random() * 100) + 30,
-        "55-64": Math.floor(Math.random() * 80) + 20,
-        "65+": Math.floor(Math.random() * 60) + 10,
-      },
-      gender: {
-        male: Math.floor(Math.random() * 200) + 100,
-        female: Math.floor(Math.random() * 200) + 100,
-        other: Math.floor(Math.random() * 20) + 5,
-        prefer_not_to_say: Math.floor(Math.random() * 30) + 10,
-      },
-      education: {
-        high_school: Math.floor(Math.random() * 100) + 50,
-        bachelors: Math.floor(Math.random() * 150) + 100,
-        masters: Math.floor(Math.random() * 80) + 40,
-        phd: Math.floor(Math.random() * 30) + 10,
-        other: Math.floor(Math.random() * 40) + 20,
-      },
-      location: {
-        "United States": Math.floor(Math.random() * 200) + 100,
-        India: Math.floor(Math.random() * 150) + 50,
-        "United Kingdom": Math.floor(Math.random() * 100) + 30,
-        Canada: Math.floor(Math.random() * 80) + 20,
-        Australia: Math.floor(Math.random() * 60) + 10,
-        Germany: Math.floor(Math.random() * 50) + 10,
-        Other: Math.floor(Math.random() * 100) + 30,
-      },
-      occupation: {
-        Technology: Math.floor(Math.random() * 150) + 80,
-        Healthcare: Math.floor(Math.random() * 100) + 50,
-        Education: Math.floor(Math.random() * 80) + 40,
-        Finance: Math.floor(Math.random() * 70) + 30,
-        Government: Math.floor(Math.random() * 60) + 20,
-        Retail: Math.floor(Math.random() * 50) + 20,
-        Other: Math.floor(Math.random() * 120) + 60,
-      },
+  // Initialize the first candidate when component mounts
+  useEffect(() => {
+    if (currentQuestion && currentQuestion.candidates.length > 0 && !selectedCandidate) {
+      setSelectedCandidate(currentQuestion.candidates[0].id.toString())
     }
-  }
+  }, [currentQuestion, selectedCandidate])
+
+  // Fetch demographic data when candidate selection changes
+  useEffect(() => {
+    if (!selectedQuestion || !selectedCandidate) return
+
+    const fetchDemographicData = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const response = await axiosInstance.get(
+          `/elections/${electionId}/questions/${selectedQuestion}/candidates/${selectedCandidate}/demographics`,
+        )
+        setDemographicData(response.data.data)
+      } catch (err) {
+        console.error("Error fetching demographic data:", err)
+        setError("Failed to load demographic data")
+        setDemographicData(null)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchDemographicData()
+  }, [electionId, selectedQuestion, selectedCandidate])
 
   // Prepare chart data based on demographic type
   const prepareChartData = () => {
-    if (!currentCandidate) return []
-
-    // In a real app, you would use actual data from your API
-    // For now, we'll generate mock data
-    const demographics = currentCandidate.demographics || getMockDemographicData(currentCandidate.id)
+    if (!demographicData) return []
 
     switch (demographicType) {
       case "age":
-        return Object.entries(demographics.age).map(([age, count]) => ({
+        return Object.entries(demographicData.age).map(([age, count]) => ({
           name: age,
           votes: count,
         }))
       case "gender":
-        return Object.entries(demographics.gender).map(([gender, count]) => ({
+        return Object.entries(demographicData.gender).map(([gender, count]) => ({
           name: gender === "prefer_not_to_say" ? "Prefer not to say" : gender.charAt(0).toUpperCase() + gender.slice(1),
           votes: count,
         }))
       case "education":
-        return Object.entries(demographics.education).map(([edu, count]) => ({
+        return Object.entries(demographicData.education).map(([edu, count]) => ({
           name:
             edu === "high_school"
               ? "High School"
@@ -171,7 +134,7 @@ export function DemographicCharts({ results }: DemographicChartsProps) {
           votes: count,
         }))
       case "location":
-        return Object.entries(demographics.location)
+        return Object.entries(demographicData.location)
           .sort((a, b) => b[1] - a[1]) // Sort by count descending
           .slice(0, 6) // Take top 6 countries
           .map(([country, count]) => ({
@@ -179,7 +142,7 @@ export function DemographicCharts({ results }: DemographicChartsProps) {
             votes: count,
           }))
       case "occupation":
-        return Object.entries(demographics.occupation)
+        return Object.entries(demographicData.occupation)
           .sort((a, b) => b[1] - a[1]) // Sort by count descending
           .slice(0, 6) // Take top 6 occupations
           .map(([occupation, count]) => ({
@@ -280,9 +243,18 @@ export function DemographicCharts({ results }: DemographicChartsProps) {
                 Votes for {currentCandidate?.name || "Selected Candidate"} by {formatDemographicType(type)}
               </h3>
 
-              {currentCandidate ? (
+              {loading ? (
+                <div className="space-y-2">
+                  <Skeleton className="h-[300px] w-full rounded-md" />
+                </div>
+              ) : error ? (
+                <Alert variant="destructive">
+                  <AlertTitle>Error</AlertTitle>
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              ) : currentCandidate && demographicData ? (
                 <div className="w-full h-[400px]">
-                  {type === "gender" ? (
+                  {shouldUsePieChart ? (
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
@@ -304,15 +276,7 @@ export function DemographicCharts({ results }: DemographicChartsProps) {
                       </PieChart>
                     </ResponsiveContainer>
                   ) : (
-                    <ChartContainer
-                      config={{
-                        votes: {
-                          label: "Votes",
-                          color: "hsl(var(--chart-1))",
-                        },
-                      }}
-                      className="h-[400px]"
-                    >
+                    <ResponsiveContainer width="100%" height="100%">
                       <BarChart
                         data={chartData}
                         layout="vertical"
@@ -321,14 +285,14 @@ export function DemographicCharts({ results }: DemographicChartsProps) {
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis type="number" />
                         <YAxis dataKey="name" type="category" width={100} tick={{ fontSize: 12 }} />
-                        <ChartTooltip content={<ChartTooltipContent />} />
-                        <Bar dataKey="votes" fill="var(--color-votes)" />
+                        <Tooltip formatter={(value) => [`${value} votes`, "Votes"]} />
+                        <Bar dataKey="votes" fill={COLORS[0]} />
                       </BarChart>
-                    </ChartContainer>
+                    </ResponsiveContainer>
                   )}
                 </div>
               ) : (
-                <div className="text-center py-12 text-gray-500">
+                <div className="text-center py-12 text-gray-500 dark:text-gray-400">
                   Please select a candidate to view demographic data
                 </div>
               )}

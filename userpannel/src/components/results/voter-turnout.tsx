@@ -1,92 +1,102 @@
-    "use client"
+"use client"
 
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Skeleton } from "@/components/ui/skeleton"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import axiosInstance from "@/services/axiosInstance"
 
-interface TurnoutData {
-  age?: {
-    "18-24": number
-    "25-34": number
-    "35-44": number
-    "45-54": number
-    "55-64": number
-    "65+": number
-  }
-  gender?: {
-    male: number
-    female: number
-    other: number
-    prefer_not_to_say: number
-  }
-  education?: {
-    high_school: number
-    bachelors: number
-    masters: number
-    phd: number
-    other: number
-  }
-  location?: {
-    [country: string]: number
+interface VoterTurnoutData {
+  totalVoters: number
+  actualVoters: number
+  turnoutPercentage: number
+  turnoutByDemographic: {
+    age: Record<string, number>
+    gender: Record<string, number>
+    education: Record<string, number>
+    location: Record<string, number>
   }
 }
 
 interface VoterTurnoutProps {
-  totalVoters: number
-  actualVoters: number
-  turnoutData?: TurnoutData
+  electionId: string | number
 }
 
-export function VoterTurnout({ totalVoters, actualVoters, turnoutData }: VoterTurnoutProps) {
-  const turnoutPercentage = Math.round((actualVoters / totalVoters) * 100)
+export function VoterTurnout({ electionId }: VoterTurnoutProps) {
+  const [turnoutData, setTurnoutData] = useState<VoterTurnoutData | null>(null)
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
 
-  // Mock turnout data for demonstration
-  // In a real app, this would come from your API
-  const mockTurnoutData: TurnoutData = turnoutData || {
-    age: {
-      "18-24": 45,
-      "25-34": 62,
-      "35-44": 71,
-      "45-54": 78,
-      "55-64": 83,
-      "65+": 85,
-    },
-    gender: {
-      male: 68,
-      female: 72,
-      other: 65,
-      prefer_not_to_say: 58,
-    },
-    education: {
-      high_school: 58,
-      bachelors: 72,
-      masters: 85,
-      phd: 92,
-      other: 63,
-    },
-    location: {
-      "United States": 74,
-      India: 68,
-      "United Kingdom": 71,
-      Canada: 76,
-      Australia: 79,
-      Germany: 82,
-      Other: 65,
-    },
+  useEffect(() => {
+    const fetchTurnoutData = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const response = await axiosInstance.get(`/elections/${electionId}/turnout`)
+        setTurnoutData(response.data.data)
+      } catch (err) {
+        console.error("Error fetching turnout data:", err)
+        setError("Failed to load voter turnout data")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchTurnoutData()
+  }, [electionId])
+
+  if (loading) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Voter Turnout</CardTitle>
+          <CardDescription>Loading turnout data...</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <Skeleton className="h-[50px] w-full rounded-md" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Skeleton className="h-[250px] w-full rounded-md" />
+              <Skeleton className="h-[250px] w-full rounded-md" />
+              <Skeleton className="h-[250px] w-full rounded-md" />
+              <Skeleton className="h-[250px] w-full rounded-md" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (error || !turnoutData) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Voter Turnout</CardTitle>
+          <CardDescription>Error loading turnout data</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Alert variant="destructive">
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error || "Failed to load data"}</AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    )
   }
 
   // Prepare chart data
-  const ageData = Object.entries(mockTurnoutData.age || {}).map(([age, percentage]) => ({
+  const ageData = Object.entries(turnoutData.turnoutByDemographic.age).map(([age, percentage]) => ({
     name: age,
     turnout: percentage,
   }))
 
-  const genderData = Object.entries(mockTurnoutData.gender || {}).map(([gender, percentage]) => ({
+  const genderData = Object.entries(turnoutData.turnoutByDemographic.gender).map(([gender, percentage]) => ({
     name: gender === "prefer_not_to_say" ? "Prefer not to say" : gender.charAt(0).toUpperCase() + gender.slice(1),
     turnout: percentage,
   }))
 
-  const educationData = Object.entries(mockTurnoutData.education || {}).map(([edu, percentage]) => ({
+  const educationData = Object.entries(turnoutData.turnoutByDemographic.education).map(([edu, percentage]) => ({
     name:
       edu === "high_school"
         ? "High School"
@@ -100,7 +110,7 @@ export function VoterTurnout({ totalVoters, actualVoters, turnoutData }: VoterTu
     turnout: percentage,
   }))
 
-  const locationData = Object.entries(mockTurnoutData.location || {})
+  const locationData = Object.entries(turnoutData.turnoutByDemographic.location)
     .sort((a, b) => b[1] - a[1]) // Sort by percentage descending
     .slice(0, 6) // Take top 6 countries
     .map(([country, percentage]) => ({
@@ -113,10 +123,26 @@ export function VoterTurnout({ totalVoters, actualVoters, turnoutData }: VoterTu
       <CardHeader>
         <CardTitle>Voter Turnout</CardTitle>
         <CardDescription>
-          {actualVoters} out of {totalVoters} eligible voters participated ({turnoutPercentage}%)
+          {turnoutData.actualVoters} out of {turnoutData.totalVoters} eligible voters participated (
+          {turnoutData.turnoutPercentage}
+          %)
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900 rounded-lg">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+            <div>
+              <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-100">Overall Turnout</h3>
+              <p className="text-blue-700 dark:text-blue-200">
+                {turnoutData.turnoutPercentage}% of eligible voters participated in this election
+              </p>
+            </div>
+            <div className="text-3xl font-bold text-blue-800 dark:text-blue-100">
+              {turnoutData.actualVoters} / {turnoutData.totalVoters}
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Age Turnout */}
           <Card>
@@ -125,23 +151,15 @@ export function VoterTurnout({ totalVoters, actualVoters, turnoutData }: VoterTu
             </CardHeader>
             <CardContent>
               <div className="h-[250px]">
-                <ChartContainer
-                  config={{
-                    turnout: {
-                      label: "Turnout %",
-                      color: "hsl(var(--chart-2))",
-                    },
-                  }}
-                  className="h-[250px]"
-                >
+                <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={ageData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis domain={[0, 100]} />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar dataKey="turnout" fill="var(--color-turnout)" />
+                    <Tooltip formatter={(value) => [`${value}%`, "Turnout"]} />
+                    <Bar dataKey="turnout" fill="#0088FE" />
                   </BarChart>
-                </ChartContainer>
+                </ResponsiveContainer>
               </div>
             </CardContent>
           </Card>
@@ -153,23 +171,15 @@ export function VoterTurnout({ totalVoters, actualVoters, turnoutData }: VoterTu
             </CardHeader>
             <CardContent>
               <div className="h-[250px]">
-                <ChartContainer
-                  config={{
-                    turnout: {
-                      label: "Turnout %",
-                      color: "hsl(var(--chart-3))",
-                    },
-                  }}
-                  className="h-[250px]"
-                >
+                <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={genderData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis domain={[0, 100]} />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar dataKey="turnout" fill="var(--color-turnout)" />
+                    <Tooltip formatter={(value) => [`${value}%`, "Turnout"]} />
+                    <Bar dataKey="turnout" fill="#00C49F" />
                   </BarChart>
-                </ChartContainer>
+                </ResponsiveContainer>
               </div>
             </CardContent>
           </Card>
@@ -181,23 +191,15 @@ export function VoterTurnout({ totalVoters, actualVoters, turnoutData }: VoterTu
             </CardHeader>
             <CardContent>
               <div className="h-[250px]">
-                <ChartContainer
-                  config={{
-                    turnout: {
-                      label: "Turnout %",
-                      color: "hsl(var(--chart-4))",
-                    },
-                  }}
-                  className="h-[250px]"
-                >
+                <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={educationData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis domain={[0, 100]} />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar dataKey="turnout" fill="var(--color-turnout)" />
+                    <Tooltip formatter={(value) => [`${value}%`, "Turnout"]} />
+                    <Bar dataKey="turnout" fill="#FFBB28" />
                   </BarChart>
-                </ChartContainer>
+                </ResponsiveContainer>
               </div>
             </CardContent>
           </Card>
@@ -209,23 +211,15 @@ export function VoterTurnout({ totalVoters, actualVoters, turnoutData }: VoterTu
             </CardHeader>
             <CardContent>
               <div className="h-[250px]">
-                <ChartContainer
-                  config={{
-                    turnout: {
-                      label: "Turnout %",
-                      color: "hsl(var(--chart-5))",
-                    },
-                  }}
-                  className="h-[250px]"
-                >
+                <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={locationData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis domain={[0, 100]} />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar dataKey="turnout" fill="var(--color-turnout)" />
+                    <Tooltip formatter={(value) => [`${value}%`, "Turnout"]} />
+                    <Bar dataKey="turnout" fill="#FF8042" />
                   </BarChart>
-                </ChartContainer>
+                </ResponsiveContainer>
               </div>
             </CardContent>
           </Card>

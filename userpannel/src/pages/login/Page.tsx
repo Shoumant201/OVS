@@ -74,7 +74,7 @@ const LoginPage = ({
       } else {
         // Store token and redirect to dashboard
         Cookies.set("token", response.data.token, { expires: 30 })
-        router.push(`/${locale}/home`)
+        router.push(`/${locale}`)
       }
     } catch (error: any) {
       console.error("Login error:", error)
