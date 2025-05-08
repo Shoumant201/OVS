@@ -28,6 +28,20 @@ import { isAdmin, hasRole } from "../middleware/admin.middleware.js";
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /api/elections/createElection:
+ *   post:
+ *     summary: Create a new election
+ *     tags: [Election]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       201:
+ *         description: Election created
+ *       401:
+ *         description: Unauthorized
+ */
 // CRUD Operations - Only Admins/Commissioners should have access
 router.post(
     "/createElection",
@@ -36,9 +50,64 @@ router.post(
     createElectionController
 );
 
+/**
+ * @swagger
+ * /api/elections/{id}:
+ *   get:
+ *     summary: Get election by ID
+ *     tags: [Election]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Election retrieved
+ *       404:
+ *         description: Election not found
+ */
 router.get("/:id", authenticate, getElectionByIdController); // Can get all elections by user with authentication, modify later as needed
+
+/**
+ * @swagger
+ * /api/elections/:
+ *   get:
+ *     summary: Get all elections
+ *     tags: [Election]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of elections
+ *       401:
+ *         description: Unauthorized
+ */
 router.get("/", authenticate, getAllElectionsController);   // Can get elections
 
+/**
+ * @swagger
+ * /api/elections/{id}:
+ *   put:
+ *     summary: Update election
+ *     tags: [Election]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Election updated
+ *       401:
+ *         description: Unauthorized
+ */
 router.put(
     "/:id",
     authenticate,
@@ -47,6 +116,26 @@ router.put(
     updateElectionController
 );
 
+/**
+ * @swagger
+ * /api/elections/{id}:
+ *   delete:
+ *     summary: Delete election
+ *     tags: [Election]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Election deleted
+ *       401:
+ *         description: Unauthorized
+ */
 router.delete(
     "/:id",
     authenticate,
@@ -55,20 +144,141 @@ router.delete(
     deleteElectionController
 );
 
+/**
+ * @swagger
+ * /api/elections/{id}/users:
+ *   get:
+ *     summary: Get users registered in an election
+ *     tags: [Election]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of users in election
+ */
 // Operations Regarding user for elections like registering in election,
 router.get("/:id/users", authenticate, isAdmin, hasRole(["super_admin", "commissioner"]), getUsersInElectionController);
 
-
+/**
+ * @swagger
+ * /api/elections/createQuestion:
+ *   post:
+ *     summary: Create a question
+ *     tags: [Question]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       201:
+ *         description: Question created
+ */
 router.post("/createQuestion", authenticate, isAdmin, hasRole(["super_admin", "commissioner", "admin"]), createQuestionController )
+
+/**
+ * @swagger
+ * /api/elections/createCandidate:
+ *   post:
+ *     summary: Create a candidate
+ *     tags: [Candidate]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       201:
+ *         description: Candidate created
+ */
 router.post("/createCandidate", authenticate, isAdmin, hasRole(["super_admin", "commissioner", "admin"]), createCandidateController )
 
+/**
+ * @swagger
+ * /api/elections/getAllQuestions:
+ *   get:
+ *     summary: Get all questions
+ *     tags: [Question]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of questions
+ */
 router.get("/getAllQuestions", authenticate, getAllQuestionsController);
+
+/**
+ * @swagger
+ * /api/elections/getAllQuestions/{id}:
+ *   get:
+ *     summary: Get questions by election ID
+ *     tags: [Question]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: List of questions for the election
+ */
 router.get("/getAllQuestions/:id", authenticate, getQuestionByElectionIdController);
 
+/**
+ * @swagger
+ * /api/elections/getAllCandidates:
+ *   get:
+ *     summary: Get all candidates
+ *     tags: [Candidate]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of candidates
+ */
 router.get("/getAllCandidates", authenticate, getAllCandidatesController);
+
+/**
+ * @swagger
+ * /api/elections/getAllCandidates/{id}:
+ *   get:
+ *     summary: Get candidates by question ID
+ *     tags: [Candidate]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: List of candidates for the question
+ */
 router.get("/getAllCandidates/:id", authenticate, getCandidatesByQuestionIdController);
 
-
+/**
+ * @swagger
+ * /api/elections/deleteQuestion/{id}:
+ *   delete:
+ *     summary: Delete a question
+ *     tags: [Question]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Question deleted
+ */
 router.delete(
     "/deleteQuestion/:id",
     authenticate,
@@ -77,6 +287,24 @@ router.delete(
     deleteQuestionController
 );
 
+/**
+ * @swagger
+ * /api/elections/deleteCandidate/{id}:
+ *   delete:
+ *     summary: Delete a candidate
+ *     tags: [Candidate]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Candidate deleted
+ */
 router.delete(
     "/deleteCandidate/:id",
     authenticate,
@@ -85,6 +313,24 @@ router.delete(
     deleteCandidateController
 );
 
+/**
+ * @swagger
+ * /api/elections/updateQuestion/{id}:
+ *   put:
+ *     summary: Update a question
+ *     tags: [Question]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Question updated
+ */
 router.put(
     "/updateQuestion/:id",
     authenticate,
@@ -93,6 +339,24 @@ router.put(
     updateQuestionController
 );
 
+/**
+ * @swagger
+ * /api/elections/updateCandidate/{id}:
+ *   put:
+ *     summary: Update a candidate
+ *     tags: [Candidate]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Candidate updated
+ */
 router.put(
     "/updateCandidate/:id",
     authenticate,
@@ -101,6 +365,24 @@ router.put(
     updateCandidateController
 );
 
+/**
+ * @swagger
+ * /api/elections/{id}/results-visibility:
+ *   put:
+ *     summary: Update results visibility
+ *     tags: [Election]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Visibility updated
+ */
 router.put(
     "/:id/results-visibility",
     authenticate,
@@ -108,9 +390,45 @@ router.put(
     hasRole(["super_admin", "commissioner", "admin"])
   )
   
+/**
+ * @swagger
+ * /api/elections/{id}/publish:
+ *   post:
+ *     summary: Publish election results
+ *     tags: [Election]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         schema:
+ *           type: string
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: Election results published
+ */
   // Publish election results
   router.post("/:id/publish",authenticate, publishElectionResults)
 
+/**
+ * @swagger
+ * /api/elections/{id}/launch:
+ *   post:
+ *     summary: Launch an election
+ *     tags: [Election]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         schema:
+ *           type: string
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: Election launched
+ */
   router.post("/:id/launch",authenticate, launchElection)
 
 export default router;
