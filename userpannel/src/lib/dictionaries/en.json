@@ -253,7 +253,8 @@
     "loggingIn": "Logging in...",
     "newHere": "New here?",
     "signUp": "Sign up",
-    "signUpMessage": "Sign up and explore new opportunities!"
+    "signUpMessage": "Sign up and explore new opportunities!",
+    "alreadyamember?" : "Already a Member?" 
   },
   "error": {
     "loginFailed": "Login failed. Please check your credentials.",
