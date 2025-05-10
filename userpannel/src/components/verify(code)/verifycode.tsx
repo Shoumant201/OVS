@@ -8,6 +8,8 @@ import { verifyOTP, resendOTP } from "@/services/api/Authentication" // Assuming
 // import { useLanguage } from "@/lib/language-provider" // Not needed if passing locale
 import { LocalizedLink } from "@/components/LocalizedLink" // Can be used for static links
 import { type Locale } from '@/lib/dictionary'
+import { Label } from "../ui/label"
+import { Input } from "../ui/input"
 
 // Props for the page component
 interface VerifyCodePageProps {
@@ -53,7 +55,7 @@ export default function VerifyCodePage({ dictionary, locale }: VerifyCodePagePro
         return;
       }
       // Assuming verifyOTP needs the tempToken, adjust if it's handled internally by verifyOTP
-      const result = await verifyOTP(code, tempToken); 
+      const result = await verifyOTP(code); 
 
       if (result.success && result.token) { // Assuming verifyOTP returns the final token
         localStorage.removeItem("tempToken"); // Clear temp token
@@ -83,7 +85,7 @@ export default function VerifyCodePage({ dictionary, locale }: VerifyCodePagePro
           return;
       }
       // Assuming resendOTP needs the tempToken from localStorage
-      const result = await resendOTP(tempToken);
+      const result = await resendOTP();
 
       if (!result.success) {
         setError(result.error || t.errorResendFailed || "Failed to resend code")
@@ -134,7 +136,7 @@ export default function VerifyCodePage({ dictionary, locale }: VerifyCodePagePro
             type="text"
             value={code}
             title="OTP" // Consider translating this if it's user-visible, or remove if not
-            onChange={(e) => setCode(e.target.value)}
+            onChange={(e:any) => setCode(e.target.value)}
             className={commonInputClass}
             maxLength={6} // Common OTP length
             autoComplete="one-time-code"

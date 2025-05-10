@@ -7,7 +7,7 @@
       LOGOUT: "/auth/logout",
       VERIFY_EMAIL: "/auth/verify/:token",
       FORGOT_PASSWORD: "/auth/forgot-password",
-      RESET_PASSWORD: "/auth/reset-password",
+      RESET_PASSWORD: "/auth/reset-password/:token",
       CREATE_USERPROFILE: "/auth/createUserProfile",
       SETUP_2FA: "/auth/enable2FA",
       ENABLE_ONBOARDING: "/auth/onboarding",

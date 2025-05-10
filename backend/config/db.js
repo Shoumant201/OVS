@@ -78,6 +78,64 @@ const createTables = async () => {
       CONSTRAINT email_verifications_pkey PRIMARY KEY (id)
     );
 
+    CREATE TABLE IF NOT EXISTS public.nationid (
+      id SERIAL PRIMARY KEY,
+      id_number VARCHAR(50) UNIQUE NOT NULL,
+      full_name VARCHAR(255) NOT NULL,
+      date_of_birth DATE NOT NULL,
+      gender CHAR(1) CHECK (gender IN ('M', 'F', 'O')) NOT NULL,
+      address TEXT,
+      mother_name VARCHAR(255),
+      father_name VARCHAR(255),
+      is_valid BOOLEAN NOT NULL,
+      is_active BOOLEAN NOT NULL,
+      issued_at DATE NOT NULL,
+      expires_at DATE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS public.national_ids (
+        id SERIAL PRIMARY KEY,
+        id_number VARCHAR(50) NOT NULL,
+        user_id VARCHAR(50) NOT NULL,
+        verified_at TIMESTAMP NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT national_ids_id_number_user_id_unique UNIQUE (id_number, user_id)
+    );
+
+    DO $$
+    BEGIN
+        IF NOT EXISTS (
+            SELECT 1 FROM information_schema.table_constraints
+            WHERE constraint_name = 'fk_national_id'
+        ) THEN
+            ALTER TABLE public.national_ids
+            ADD CONSTRAINT fk_national_id
+            FOREIGN KEY (id_number)
+            REFERENCES public.nationid (id_number)
+            ON DELETE CASCADE;
+        END IF;
+    END
+    $$;
+
+    DO $$
+    BEGIN
+        IF NOT EXISTS (
+            SELECT 1 FROM information_schema.table_constraints
+            WHERE constraint_name = 'fk_user'
+        ) THEN
+            ALTER TABLE public.national_ids
+            ADD CONSTRAINT fk_user
+            FOREIGN KEY (user_id)
+            REFERENCES public.users (id)
+            ON DELETE CASCADE;
+        END IF;
+    END
+    $$;
+
+
     DO $$
     BEGIN
       IF NOT EXISTS (

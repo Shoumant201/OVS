@@ -253,6 +253,7 @@ export const updateUserProfile = async (userId, profileData) => {
 };
 
 
+
 // export const updateUserPassword1 = async (userId, newPassword) => {
 //   const hashedPassword = await bcrypt.hash(newPassword, 10);
 //   const result = await pool.query(

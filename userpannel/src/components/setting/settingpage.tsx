@@ -180,6 +180,8 @@ export default function SettingsPage({ dictionary, locale }: SettingsPageProps) 
       setSavingProfile(false);
       return;
     }
+
+    const currentLocale = locale || sessionStorage.getItem("currentLocale") || "en"
     
     try {
       const decoded = jwtDecode<DecodedToken>(token);
@@ -197,7 +199,7 @@ export default function SettingsPage({ dictionary, locale }: SettingsPageProps) 
         formData.append("file", imageFile)
         // formData.append("upload_preset", "user_profiles") // For direct Cloudinary
         // const uploadResponse = await axios.post(`https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload`, formData);
-        const uploadResponse = await axios.post("/api/upload", formData); // Using local API endpoint
+        const uploadResponse = await axios.post(`/${currentLocale}/api/upload`, formData); // Using local API endpoint
         imageUrl = uploadResponse.data.url || uploadResponse.data.secure_url; // Adjust based on your /api/upload response
       }
 

@@ -69,17 +69,16 @@ export default function ElectionsPage({
   }, [])
 
   const filteredElections = elections.filter((election) => {
-    // Apply search filter
+    const title = election.title || ""
+    const description = election.description || ""
+  
     const matchesSearch =
       searchTerm === "" ||
-      election.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      election.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      //election.organization.toLowerCase().includes(searchTerm.toLowerCase())
-      false
-
-    // Apply status filter
+      title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      description.toLowerCase().includes(searchTerm.toLowerCase())
+  
     const matchesStatus = statusFilter === null || election.status === statusFilter
-
+  
     return matchesSearch && matchesStatus
   })
 
