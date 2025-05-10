@@ -1,58 +1,17 @@
-'use client'
-import { useRouter, useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import axios from '@/services/axiosInstance'; // Adjust path based on where you keep your AxiosInstance
-import  ENDPOINTS  from '@/services/Endpoints'; // Adjust path based on your project structure
+// Example: app/[lang]/verify-email/[token]/page.tsx 
+// The [token] part in the folder name captures the token from the URL.
 
-const VerifyPage = () => {
-  const params = useParams();
-  const router = useRouter();
-  
-  const token = params?.token as string;
-  const [status, setStatus] = useState<'verifying' | 'success' | 'failed'>('verifying');
+import { type Locale, getDictionary } from "@/lib/dictionary";
+import VerifyPageClient from "@/components/verify(token)/verifytoken"; // Adjust path as needed
 
-  useEffect(() => {
-    const verifyEmail = async () => {
-        if (!token) return;
+export default async function VerifyEmail({
+  params,
+}: {
+  params: { lang: Locale; token: string }; // token is part of params from the route
+}) {
+  const lang = params?.lang || "en";
+  const dictionary = await getDictionary(lang);
 
-      try {
-        const url = ENDPOINTS.AUTH.VERIFY_EMAIL.replace(':token', token);
-        const res = await axios.get(url); // assuming it's a GET endpoint
-
-        if (res.status === 200) {
-          setStatus('success');
-          setTimeout(() => router.push('/login'), 3000);
-        } else {
-          setStatus('failed');
-          setTimeout(() => router.push('/login'), 5000);
-        }
-      } catch (error) {
-        console.error('Verification error:', error);
-        setStatus('failed');
-        setTimeout(() => router.push('/login'), 5000);
-      }
-    };
-
-    verifyEmail();
-  }, [token, router]);
-
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center text-center p-4">
-      {status === 'verifying' && <p className="text-lg">Verifying your email...</p>}
-      {status === 'success' && (
-        <div>
-          <p className="text-green-600 text-xl font-semibold">✅ Email verified successfully!</p>
-          <p className="mt-2 text-gray-500">Redirecting to login...</p>
-        </div>
-      )}
-      {status === 'failed' && (
-        <div>
-          <p className="text-red-600 text-xl font-semibold">❌ Verification failed!</p>
-          <p className="mt-2 text-gray-500">Redirecting to login...</p>
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default VerifyPage;
+  // The client component will use `useParams` to get the token
+  return <VerifyPageClient dictionary={dictionary} locale={lang} />;
+}

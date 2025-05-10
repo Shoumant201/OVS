@@ -1,11 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useParams, useRouter } from "next/navigation"
+import { useParams } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { VotingForm } from "@/components/voting/VotingForm"
 import { getElectionById, getQuestionsByElectionId, getCandidatesByQuestionId } from "@/services/api/Authentication"
+import { useLocalizedNavigation } from "@/lib/use-localized-navigation"
+import type { Locale } from "@/lib/dictionary"
 
 interface Question {
   id: number
@@ -34,13 +36,18 @@ interface Election {
   start_date: string
   end_date: string
   status: string
-  // Other election fields
 }
 
-export default function VotePage() {
+interface VotePageProps {
+  dictionary: any
+  locale: Locale
+}
+
+export default function VotePage({ dictionary, locale }: VotePageProps) {
   const params = useParams()
-  const router = useRouter()
-  const id = params?.id as string
+  const { navigate } = useLocalizedNavigation()
+  const id = params?.id as string // Changed from electionId to id
+
   const [election, setElection] = useState<Election | null>(null)
   const [questions, setQuestions] = useState<Question[]>([])
   const [candidates, setCandidates] = useState<Record<number, Candidate[]>>({})
@@ -49,62 +56,64 @@ export default function VotePage() {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!id) {
+        setError(dictionary["vote-page"].errorElectionNotFound)
+        setLoading(false)
+        return
+      }
       try {
         setLoading(true)
 
-        // Fetch election details
         const electionData = await getElectionById(id)
         if (!electionData) {
-          setError("Election not found")
+          setError(dictionary["vote-page"].errorElectionNotFound)
+          setLoading(false)
           return
         }
         setElection(electionData)
 
-        // Check if election is active
         const now = new Date()
         const startDate = new Date(electionData.start_date)
         const endDate = new Date(electionData.end_date)
 
         if (now < startDate) {
-          setError("This election has not started yet")
+          setError(dictionary["vote-page"].errorNotStarted)
+          setLoading(false)
           return
         }
 
         if (now > endDate) {
-          setError("This election has ended")
+          setError(dictionary["vote-page"].errorEnded)
+          setLoading(false)
           return
         }
 
-        // Fetch questions for this election
         const questionsData = await getQuestionsByElectionId(id)
         setQuestions(questionsData)
 
-        // Fetch candidates for each question
         const candidatesMap: Record<number, Candidate[]> = {}
-
         await Promise.all(
           questionsData.map(async (question) => {
             const questionCandidates = await getCandidatesByQuestionId(question.id)
             candidatesMap[question.id] = questionCandidates
           }),
         )
-
         setCandidates(candidatesMap)
       } catch (err) {
         console.error("Error fetching data:", err)
-        setError("Failed to load election data")
+        setError(dictionary["vote-page"].errorGeneric)
       } finally {
         setLoading(false)
       }
     }
 
     fetchData()
-  }, [id])
+  }, [id, dictionary])
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p>Loading election data...</p>
+        <p>{dictionary["vote-page"].loadingElectionData}</p>
       </div>
     )
   }
@@ -113,15 +122,15 @@ export default function VotePage() {
     return (
       <div className="min-h-screen bg-gray-50 p-6">
         <div className="max-w-4xl mx-auto">
-          <Button variant="ghost" className="mb-6" onClick={() => router.push("/elections")}>
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Elections
+          <Button variant="ghost" className="mb-6" onClick={() => navigate("/elections")}>
+            <ArrowLeft className="mr-2 h-4 w-4" /> {dictionary["vote-page"].backToElections}
           </Button>
 
           <div className="bg-red-50 border border-red-200 rounded-md p-6 text-center">
-            <h2 className="text-xl font-semibold text-red-800 mb-2">Error</h2>
-            <p className="text-red-700">{error || "Election not found"}</p>
-            <Button className="mt-4" onClick={() => router.push("/elections")}>
-              Return to Elections
+            <h2 className="text-xl font-semibold text-red-800 mb-2">{dictionary["vote-page"].errorTitle}</h2>
+            <p className="text-red-700">{error || dictionary["vote-page"].errorElectionNotFound}</p>
+            <Button className="mt-4" onClick={() => navigate("/elections")}>
+              {dictionary["vote-page"].returnToElections}
             </Button>
           </div>
         </div>
@@ -129,11 +138,13 @@ export default function VotePage() {
     )
   }
 
+  const electionDetailPath = `/home/${id}`
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-4xl mx-auto">
-        <Button variant="ghost" className="mb-6" onClick={() => router.push(`/elections/${id}`)}>
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Election Details
+        <Button variant="ghost" className="mb-6" onClick={() => navigate(electionDetailPath)}>
+          <ArrowLeft className="mr-2 h-4 w-4" /> {dictionary["vote-page"].backToElectionDetails}
         </Button>
 
         <div className="bg-white rounded-lg border p-6 mb-6">
