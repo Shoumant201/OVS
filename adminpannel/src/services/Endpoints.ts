@@ -30,7 +30,9 @@ export const Endpoints = {
     updateElection: "/elections/:id",
     updateVisibility: "/elections/:id/results-visibility",
     publishResult: "/elections/:id/publish",
-    launchElection: "/elections/:id/launch"
+    launchElection: "/elections/:id/launch",
+    getVotersByElectionId: "/elections/getVotersByElectionId/:election_id",
+    deleteVote: "/elections/deleteVote/:id",
   },
 
   BALLOT: {

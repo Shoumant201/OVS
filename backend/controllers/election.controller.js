@@ -20,6 +20,8 @@ import {
   getUserElections,
   getCandidateDemographics,
   getVoterTurnout,
+  getVotersByElectionId,
+  removeVote
 } from "../models/election.model.js"
 import { validationResult } from "express-validator"
 import pool from "../config/db.js"
@@ -1156,3 +1158,35 @@ export const launchElection = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message })
   }
 }
+
+export const getVotersByElection = async (req, res) => {
+    const { election_id } = req.params;
+
+    try {
+        const voters = await getVotersByElectionId(election_id);
+
+        if (voters.length === 0) {
+            return res.status(404).json({ message: 'No voters found for this election.' });
+        }
+
+        res.status(200).json({ voters });
+    } catch (error) {
+        console.error('Error fetching voters:', error);
+        res.status(500).json({ message: 'Server error while retrieving voters.' });
+    }
+};
+
+
+export const deleteVoteById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await removeVote(id);
+    res.status(200).json({ message: 'Vote deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting vote:', error);
+    res.status(500).json({ message: 'Failed to delete vote.' });
+  }
+};
+
+

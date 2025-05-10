@@ -581,3 +581,31 @@ export const getElectionResults = async (id) => {
       return result.rows[0];
     }
   };
+
+  export const getVotersByElectionId = async (election_id) => {
+    const result = await pool.query(
+      `
+      SELECT 
+        votes.id AS vote_id,
+        votes.user_id,
+        votes.question_id,
+        votes.candidate_id,
+        questions.title AS question_text,
+        candidates.candidate_name AS candidate_name
+      FROM votes
+      JOIN questions ON votes.question_id = questions.id
+      JOIN candidates ON votes.candidate_id = candidates.id
+      WHERE votes.election_id = $1
+      `,
+      [election_id]
+    );
+    return { voters: result.rows }; // consistent format for frontend
+  };
+  
+
+  export const removeVote = async (id) => {
+    await pool.query(
+      `DELETE FROM votes WHERE id = $1`,
+      [id]
+    );
+  }

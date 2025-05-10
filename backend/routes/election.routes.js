@@ -29,6 +29,8 @@ import {
     recordVoteController,
     exportElectionResultsController,
     exportDemographicDataController,
+    getVotersByElection,
+    deleteVoteById,
 } from "../controllers/election.controller.js";
 import { authenticate } from "../middleware/authMiddleware.js"; // Fixed import
 import { isAdmin, hasRole } from "../middleware/admin.middleware.js";
@@ -598,6 +600,14 @@ router.get("/:electionId/demographics/export", authenticate, exportDemographicDa
  */
 router.get("/:electionId/votes", authenticate, getUserVotesController)
 
+router.get(
+    "/getVotersByElectionId/:election_id",
+    authenticate,
+    //hasRole(["super_admin", "commissioner", "admin"]), // Adjust Permissions Here
+    getVotersByElection
+);
+
+router.delete("/deleteVote/:id", authenticate, deleteVoteById);
 
 
 export default router;

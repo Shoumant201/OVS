@@ -155,3 +155,25 @@ export const getUsersAPI = async () => {
       throw err;
     }
   }
+
+  export const getVotersByElectionId = async (electionId: any) => {
+    try{
+      const url = Endpoints.ELECTION.getVotersByElectionId.replace(":election_id", electionId)
+      const response = await AxiosInstance.get(url)
+      return response.data
+    }catch (err) {
+      console.error("Error fetching voters:", err);
+      throw err;
+    }
+  }
+
+  export const deleteVote = async (id: any) => {
+    try{
+      const url = Endpoints.ELECTION.deleteVote.replace(":id", id)
+      const response = await AxiosInstance.delete(url)
+      return response.data
+    }catch (err){
+      console.error("Error deleting vote:", err);
+      throw err;
+    }
+  }
